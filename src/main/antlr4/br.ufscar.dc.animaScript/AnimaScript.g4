@@ -23,4 +23,4 @@ WS	:	(' ' | '\t' | '\r' | '\n') -> skip;
 // O mesmo acontece caso o haja algum comentario nao fechado
 //COMENTARIO_NAO_FECHADO: '{' ~('}' | '\n')* '\n' {Main.lexicalError = "Linha "+getLine()+ ": comentario nao fechado";};
 
-programa:;
+programa: ;

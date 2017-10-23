@@ -1,6 +1,9 @@
 package br.ufscar.dc.animaScript.utils;
 
 public class ResultadoParser {
+    private String nomeEntrada;
+    private String nomeSaida;
+
     // Resultado das análises, se for vazio significa que não houveram erros
     private StringBuffer resultadoAnalise;
     // Caso haja erro, modificado se torna true e resultado análise conterá o erro
@@ -17,6 +20,30 @@ public class ResultadoParser {
 
         saidaHtml = new StringBuffer();
         saidaJs = new StringBuffer();
+    }
+
+    public String getNomeEntrada() {
+        return nomeEntrada;
+    }
+
+    public String getNomeSaida() {
+        return nomeSaida;
+    }
+
+    public StringBuffer getSaidaHtml() {
+        return saidaHtml;
+    }
+
+    public StringBuffer getSaidaJs() {
+        return saidaJs;
+    }
+
+    public void setNomeEntrada(String arqEntrada) {
+        this.nomeEntrada = arqEntrada;
+    }
+
+    public void setNomeSaida(String arqSaida) {
+        this.nomeSaida = arqSaida;
     }
 
     public void printErro(int linha, String erro) {

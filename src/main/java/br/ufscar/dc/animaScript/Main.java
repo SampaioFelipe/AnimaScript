@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import br.ufscar.dc.animaScript.utils.ErrorParserListener;
@@ -16,16 +17,11 @@ public class Main {
     public static ResultadoParser saida = new ResultadoParser();
 
     public static void main(String[] args) {
-        // Verifica se ha argumentos suficientes para a execucao do compilador
-        if (args == null || args.length < 2) {
-            System.out.println("USO: java -jar anima " +
-                    "'arquivo a ser compilado' " +
-                    "'nome do arquivo destino'");
-        } else {
 
+         if (validateArgs(args)){
             try {
                 // Abre o arquivo com o codigo a ser compilado
-                ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(args[0]));
+                ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(saida.getNomeEntrada()));
 
                 // Inicializa a estrutura de tokenizacao do antlr
                 AnimaScriptLexer lexer = new AnimaScriptLexer(input);
@@ -61,13 +57,60 @@ public class Main {
             }
 
             // Grava no arquivo de saida o resultado da compilacao
-//            File saidaCasoTeste = new File(args[1]);
-//            saidaCasoTeste.createNewFile();
-//            PrintWriter pw = new PrintWriter(new FileWriter(saidaCasoTeste));
-//
-//            pw.print(out);
-//            pw.flush();
-//            pw.close();
+             try {
+                 File saidaCasoTeste = new File(saida.getNomeSaida());
+                 saidaCasoTeste.createNewFile();
+                 PrintWriter pw = new PrintWriter(new FileWriter(saidaCasoTeste));
+
+                 pw.print(saida.getSaidaHtml());
+                 pw.flush();
+                 pw.close();
+             } catch (IOException E){
+
+             }
+
+        } else {
+             printHelp();
+         }
+    }
+
+    public static void printHelp(){
+        String texto = "Uso: java -jar anima [OPTIONS] fileA fileB\n" +
+                "Compila código em animaScript...\n" +
+                "Options:\n" +
+                "-v...  ";
+
+        System.out.println(texto);
+    }
+
+    public static boolean validateArgs(String[] args) {
+        if (args == null || args.length < 2) {
+            return false;
         }
+
+        String arg = args[0];
+        int i = 1;
+        while (arg.startsWith("-")) {
+            if (arg.equalsIgnoreCase("-v")) {
+
+            } else {
+                return false;
+            }
+
+            arg = args[i++];
+        }
+
+        if((args.length != i + 1)) {
+            return false;
+        }
+
+        saida.setNomeEntrada(args[i-1]);
+        saida.setNomeSaida(args[i]);
+
+        return true;
+    }
+
+    private static void inicializaArquivos(){
+
     }
 }
