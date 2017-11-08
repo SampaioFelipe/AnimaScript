@@ -1,4 +1,4 @@
--- Isso é um comentario
+# Isso é um comentario
 
 @animation "Título da Animação"
 @authors "Nome dos autores"
@@ -9,13 +9,13 @@ composition:
     hight = 500
     fps = 30
     duration = 1h10m15s
-    background = #000000
+    background = "#00000"
 
 elements:
     Moon
     {
         image = "https://mdn.mozillademos.org/files/1443/Canvas_moon.png"
-        width = 50% -- ao configurar um dos atributos de tamanho, o outro mantém a
+        width = 50% # ao configurar um dos atributos de tamanho, o outro mantém a
     }
 
     Earth
@@ -24,7 +24,7 @@ elements:
 
         Moon lua
 
-        -- Elementos também possuem ações, que podem alterar suas propriedades
+        # Elementos também possuem ações, que podem alterar suas propriedades
         action rotate_lua() {
             lua.rotation += 5 deg
         }

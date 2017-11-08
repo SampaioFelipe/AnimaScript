@@ -1,5 +1,10 @@
 package br.ufscar.dc.animaScript.utils;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 public class ResultadoParser {
     private String nomeEntrada;
     private String nomeSaida;
@@ -66,6 +71,22 @@ public class ResultadoParser {
     public void printJS(String codigo) {
         saidaJs.append(codigo);
         saidaJs.append("\n");
+    }
+
+    public void generate() {
+        // Grava no arquivo de saida o resultado da compilacao
+        System.out.println(getSaidaHtml());
+        try {
+            File saidaCasoTeste = new File(this.nomeSaida);
+            saidaCasoTeste.createNewFile();
+            PrintWriter pw = new PrintWriter(new FileWriter(saidaCasoTeste));
+            System.out.println(getSaidaHtml());
+            pw.print(getSaidaHtml());
+            pw.flush();
+            pw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

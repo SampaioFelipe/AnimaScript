@@ -21,9 +21,9 @@ NUM_REAL : DIGITO+ '.' DIGITO+;
 CADEIA : '"' ~('\n' | '\r' | '"')* '"';
 VAL_LOGICO : 'true' | 'false';
 TEMPO: ((DIGITO+ 'h')? DIGITO+'m')? DIGITO+ 's';
-COR_HEX: '#'(DIGITO | ('a'..'f') | ('A'..'F'))*;
+//COR_HEX: (DIGITO | ('a'..'f') | ('A'..'F'))*;
 
-COMENTARIO : '--' ~('\n')* -> skip;
+COMENTARIO : '#' ~('\n')* -> skip;
 WS	:	(' ' | '\t' | '\r' | '\n') -> skip;
 
 // Caso haja qualquer caracter que nao pertenca a gramatica, e indentificado como um erro lexico
@@ -40,9 +40,9 @@ expressao: (NUM_INT | NUM_REAL) unidade?;
 
 unidade: '%' | 'deg' | 'rad' | 'f';
 
-composition: 'composition' ':' decl_prop+;
+composition: 'composition' ':' (decls+=decl_prop)+;
 
-decl_prop: IDENT '=' (valor | IDENT);
+decl_prop: prop=IDENT '=' (valor | IDENT);
 
 elements: 'elements' ':' decl_element+;
 

@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import br.ufscar.dc.animaScript.animacao.Composicao;
 import br.ufscar.dc.animaScript.utils.ErrorParserListener;
 import br.ufscar.dc.animaScript.utils.ResultadoParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -18,7 +19,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-         if (validateArgs(args)){
+        if (validateArgs(args)) {
+            System.out.println(saida.getNomeEntrada());
             try {
                 // Abre o arquivo com o codigo a ser compilado
                 ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(saida.getNomeEntrada()));
@@ -38,9 +40,14 @@ public class Main {
 
                 // Se não houve nenhum erro léxico ou sintático, prossegue para a analise semântica
                 if (!saida.isModificado()) {
-                    AnalisadorSemanticoVisitor analisadorSemantico = new AnalisadorSemanticoVisitor();
+                    Composicao composicao_principal = new Composicao();
+                    AnalisadorSemanticoVisitor analisadorSemantico = new AnalisadorSemanticoVisitor(composicao_principal);
                     analisadorSemantico.visitPrograma(arvoreSintatica);
 
+                    // Se houve erro semantico o processo e terminado e reportado o erro
+                    if (!saida.isModificado()) {
+                        GeradorCodigo geradorCodigo = new GeradorCodigo(composicao_principal);
+                    }
                 } else {
                     // Se houve algum erro lexico ele estara em lexicalErro
 //                    if (lexicalError != null) {
@@ -49,32 +56,22 @@ public class Main {
 //                    }
                 }
             } catch (FileNotFoundException pce) {
+                System.out.println("eita");
                 if (pce.getMessage() != null) {
                     saida.printErro(0, pce.getMessage());
                 }
-            } catch (Exception e){
-
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            // Grava no arquivo de saida o resultado da compilacao
-             try {
-                 File saidaCasoTeste = new File(saida.getNomeSaida());
-                 saidaCasoTeste.createNewFile();
-                 PrintWriter pw = new PrintWriter(new FileWriter(saidaCasoTeste));
-
-                 pw.print(saida.getSaidaHtml());
-                 pw.flush();
-                 pw.close();
-             } catch (IOException E){
-
-             }
+            saida.generate();
 
         } else {
-             printHelp();
-         }
+            printHelp();
+        }
     }
 
-    public static void printHelp(){
+    public static void printHelp() {
         String texto = "Uso: java -jar anima [OPTIONS] fileA fileB\n" +
                 "Compila código em animaScript...\n" +
                 "Options:\n" +
@@ -100,17 +97,13 @@ public class Main {
             arg = args[i++];
         }
 
-        if((args.length != i + 1)) {
+        if ((args.length != i + 1)) {
             return false;
         }
 
-        saida.setNomeEntrada(args[i-1]);
+        saida.setNomeEntrada(args[i - 1]);
         saida.setNomeSaida(args[i]);
 
         return true;
-    }
-
-    private static void inicializaArquivos(){
-
     }
 }
