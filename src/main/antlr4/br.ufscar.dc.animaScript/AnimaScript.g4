@@ -11,10 +11,13 @@ static String grupo = "619523, 619744, 619930";
 // Definicao de regras lexicas
 fragment DIGITO: ('0'..'9');
 
-fragment LETRA: ('a'..'z'|'A'..'Z');
+fragment MINUSCULA: ('a'..'z');
 
-IDENT : (LETRA | '_') (LETRA | DIGITO| '_')*;
-ATRIBUTO_GLOBAL: '@'LETRA (LETRA | DIGITO| '_')*;
+fragment MAISCULA: ('A'..'Z');
+
+IDENT : (MINUSCULA | '_') (MINUSCULA | MAISCULA | DIGITO| '_')*;
+IDENT_ELEMENTO : MAISCULA (MINUSCULA | MAISCULA | DIGITO | '_')*;
+ATRIBUTO_GLOBAL: '@'(MAISCULA | MINUSCULA) (MAISCULA | MINUSCULA | DIGITO| '_')*;
 NUM_INT : DIGITO+;
 NUM_REAL : DIGITO+ '.' DIGITO+;
 
@@ -32,7 +35,7 @@ WS	:	(' ' | '\t' | '\r' | '\n') -> skip;
 //ERROR: . {Main.lexicalError = "Linha "+getLine()+": "+getText()+" - simbolo nao identificado";};
 // O mesmo acontece caso o haja algum comentario nao fechado
 
-programa: decl_global composition elements storyboard;
+programa: decl_global composition elements scene storyboard;
 
 decl_global: (ATRIBUTO_GLOBAL valor)*;
 
@@ -50,13 +53,13 @@ decl_prop: prop=IDENT '=' (valor | IDENT);
 
 elements: 'elements' ':' decl_element+;
 
-decl_element: IDENT '{' (decl_prop | decl_action | element)* '}';
+decl_element: IDENT_ELEMENTO '{' (decl_prop | decl_action | element)* '}';
 
 decl_action: 'action' IDENT '(' (IDENT (',' IDENT)*)? ')' '{' comando* '}';
 
 action: IDENT '(' (expressao (',' expressao)*)? ')';
 
-element: IDENT IDENT;
+element: IDENT_ELEMENTO IDENT (',' IDENT)*;
 
 atributo_element: IDENT '.' IDENT;
 
@@ -64,6 +67,8 @@ comando: (IDENT | atributo_element) op_atribuicao (IDENT | atributo_element | ex
        | (IDENT '.')?action;
 
 op_atribuicao: '=' | '+=' | '-='| '*=';
+
+scene : 'scene' ':' (element)+;
 
 storyboard:'storyboard' ':' keyframe*;
 
