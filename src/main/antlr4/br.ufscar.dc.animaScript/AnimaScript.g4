@@ -18,6 +18,9 @@ ATRIBUTO_GLOBAL: '@'LETRA (LETRA | DIGITO| '_')*;
 NUM_INT : DIGITO+;
 NUM_REAL : DIGITO+ '.' DIGITO+;
 
+OP: ('+'|'-'|'*'|'/');
+EXP: (NUM_INT | NUM_REAL) (OP (NUM_INT | NUM_REAL))*;
+
 CADEIA : '"' ~('\n' | '\r' | '"')* '"';
 VAL_LOGICO : 'true' | 'false';
 TEMPO: ((DIGITO+ 'h')? DIGITO+'m')? DIGITO+ 's';
@@ -36,7 +39,7 @@ decl_global: (ATRIBUTO_GLOBAL valor)*;
 
 valor: CADEIA | TEMPO | expressao;
 
-expressao: (NUM_INT | NUM_REAL) unidade?;
+expressao: EXP unidade?;
 
 unidade: '%' | 'deg' | 'rad' | 'f';
 
