@@ -19,7 +19,6 @@ NUM_INT : DIGITO+;
 NUM_REAL : DIGITO+ '.' DIGITO+;
 
 OP: ('+'|'-'|'*'|'/');
-EXP: (NUM_INT | NUM_REAL) (OP (NUM_INT | NUM_REAL))*;
 
 CADEIA : '"' ~('\n' | '\r' | '"')* '"';
 VAL_LOGICO : 'true' | 'false';
@@ -39,7 +38,9 @@ decl_global: (ATRIBUTO_GLOBAL valor)*;
 
 valor: CADEIA | TEMPO | expressao;
 
-expressao: EXP unidade?;
+expressao: expressao2;
+
+expressao2: ((NUM_INT | NUM_REAL) (OP (NUM_INT | NUM_REAL))* unidade?)(OP expressao)* | ('(' expressao')');
 
 unidade: '%' | 'deg' | 'rad' | 'f';
 
