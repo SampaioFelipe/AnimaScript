@@ -63,13 +63,12 @@ element: IDENT_ELEMENTO IDENT (',' IDENT)*;
 
 atributo_element: IDENT '.' IDENT;
 
-comando: (IDENT | atributo_element) op_atribuicao (IDENT | atributo_element | expressao)
-       | (IDENT '.')?action;
-
 op_atribuicao: '=' | '+=' | '-='| '*=';
 
-scene : 'scene' ':' (element)+;
+scene: 'scene' ':' (element)+;
 
 storyboard:'storyboard' ':' keyframe*;
 
 keyframe: '['expressao']' ':' comando+;
+
+comando: IDENT '.' action '.' ('start' | 'stop');
