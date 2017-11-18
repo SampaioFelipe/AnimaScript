@@ -1,29 +1,25 @@
 package br.ufscar.dc.animaScript;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 
-import br.ufscar.dc.animaScript.animacao.Composicao;
+import br.ufscar.dc.animaScript.animation.Animation;
+import br.ufscar.dc.animaScript.animation.Composition;
 import br.ufscar.dc.animaScript.utils.ErrorParserListener;
-import br.ufscar.dc.animaScript.utils.ResultadoParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 public class Main {
 
-    public static ResultadoParser saida = new ResultadoParser();
+    public static FinalCode out = new FinalCode();
 
     public static void main(String[] args) {
 
         if (validateArgs(args)) {
-            System.out.println(saida.getNomeEntrada());
+            System.out.println(out.getInputName());
             try {
                 // Abre o arquivo com o codigo a ser compilado
-                ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(saida.getNomeEntrada()));
+                ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(out.getInputName()));
 
                 // Inicializa a estrutura de tokenizacao do antlr
                 AnimaScriptLexer lexer = new AnimaScriptLexer(input);
@@ -33,20 +29,22 @@ public class Main {
                 AnimaScriptParser parser = new AnimaScriptParser(tokens);
 
                 // Adiciona estrutra para a manipulação de erros sintaticos
-                parser.addErrorListener(new ErrorParserListener(saida));
+                parser.addErrorListener(new ErrorParserListener(out));
 
                 // Realizacao da analise e geracao da arvore sintatica
-                AnimaScriptParser.ProgramaContext arvoreSintatica = parser.programa();
+                AnimaScriptParser.ProgramContext parserTree = parser.program();
 
                 // Se não houve nenhum erro léxico ou sintático, prossegue para a analise semântica
-                if (!saida.isModificado()) {
-                    Composicao composicao_principal = new Composicao();
-                    AnalisadorSemanticoVisitor analisadorSemantico = new AnalisadorSemanticoVisitor(composicao_principal);
-                    analisadorSemantico.visitPrograma(arvoreSintatica);
+                if (!out.isChanged()) {
+                    Animation animation = new Animation();
+                    ParserVisitor parserVisitor = new ParserVisitor(animation);
+
+                    parserVisitor.visitProgram(parserTree);
 
                     // Se houve erro semantico o processo e terminado e reportado o erro
-                    if (!saida.isModificado()) {
-                        GeradorCodigo geradorCodigo = new GeradorCodigo(composicao_principal);
+                    if (!out.isChanged()) {
+                        CodeGenerator codeGenerator = new CodeGenerator(animation);
+                        codeGenerator.geraJs();
                     }
                 } else {
                     // Se houve algum erro lexico ele estara em lexicalErro
@@ -56,15 +54,14 @@ public class Main {
 //                    }
                 }
             } catch (FileNotFoundException pce) {
-                System.out.println("eita");
                 if (pce.getMessage() != null) {
-                    saida.printErro(0, pce.getMessage());
+                    out.printErro(0, pce.getMessage());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            saida.generate();
+            out.generate();
 
         } else {
             printHelp();
@@ -101,8 +98,8 @@ public class Main {
             return false;
         }
 
-        saida.setNomeEntrada(args[i - 1]);
-        saida.setNomeSaida(args[i]);
+        out.setInputName(args[i - 1]);
+        out.setOutputFolderName(args[i]);
 
         return true;
     }

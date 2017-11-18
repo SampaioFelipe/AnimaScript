@@ -9,66 +9,83 @@ static String grupo = "619523, 619744, 619930";
 }
 
 // Definicao de regras lexicas
-fragment DIGITO: ('0'..'9');
+fragment DIGIT: ('0'..'9');
 
-fragment MINUSCULA: ('a'..'z');
+fragment LOWER_CASE: ('a'..'z');
 
-fragment MAISCULA: ('A'..'Z');
+fragment UPPER_CASE: ('A'..'Z');
 
-IDENT : (MINUSCULA | '_') (MINUSCULA | MAISCULA | DIGITO| '_')*;
-IDENT_ELEMENTO : MAISCULA (MINUSCULA | MAISCULA | DIGITO | '_')*;
-ATRIBUTO_GLOBAL: '@'(MAISCULA | MINUSCULA) (MAISCULA | MINUSCULA | DIGITO| '_')*;
-NUM_INT : DIGITO+;
-NUM_REAL : DIGITO+ '.' DIGITO+;
+UNIT: '%' | 'deg' | 'rad';
 
-OP: ('+'|'-'|'*'|'/');
+OP_MATH: ('+'|'-'|'*'|'/');
+OP_ATTRIB: '=' | '+=' | '-='| '*=';
 
-CADEIA : '"' ~('\n' | '\r' | '"')* '"';
-VAL_LOGICO : 'true' | 'false';
-TEMPO: ((DIGITO+ 'h')? DIGITO+'m')? DIGITO+ 's';
-//COR_HEX: (DIGITO | ('a'..'f') | ('A'..'F'))*;
+STRING : '"' ~('\n' | '\r' | '"')* '"';
+LOGIC_VAL : 'true' | 'false';
 
-COMENTARIO : '#' ~('\n')* -> skip;
-WS	:	(' ' | '\t' | '\r' | '\n') -> skip;
+NUM_INT : DIGIT+;
+NUM_REAL : DIGIT+ '.' DIGIT+;
+
+HOUR_FORMAT: ((DIGIT? DIGIT 'h')? DIGIT? DIGIT 'm')? DIGIT? DIGIT 's';
+
+IDENT : (LOWER_CASE | '_') (LOWER_CASE | UPPER_CASE | DIGIT | '_')*;
+IDENT_DECL_ELEMENT : UPPER_CASE (LOWER_CASE | UPPER_CASE | DIGIT | '_')*;
+GLOBAL_ATTR: '@'(LOWER_CASE) (UPPER_CASE | LOWER_CASE | DIGIT| '_')*;
+
+COMMENT : '#' ~('\n')* -> skip;
+WHITE_SPACE :	(' ' | '\t' | '\r' | '\n') -> skip;
 
 // Caso haja qualquer caracter que nao pertenca a gramatica, e indentificado como um erro lexico
 //ERROR: . {Main.lexicalError = "Linha "+getLine()+": "+getText()+" - simbolo nao identificado";};
-// O mesmo acontece caso o haja algum comentario nao fechado
+// O mesmo acontece caso o haja algum COMMENT nao fechado
 
-programa: decl_global composition elements scene storyboard;
+program
+    : decl_global composition elements scene storyboard;
 
-decl_global: (ATRIBUTO_GLOBAL valor)*;
+decl_global
+    : (GLOBAL_ATTR value)*;
 
-valor: CADEIA | TEMPO | expressao;
+value
+    : STRING | time | num_value | position;
 
-expressao: expressao2;
+num_value
+    : (expr | IDENT) UNIT?;
 
-expressao2: ((NUM_INT | NUM_REAL) (OP (NUM_INT | NUM_REAL))* unidade?)(OP expressao)* | ('(' expressao')');
+position
+    : '(' num_value ',' num_value ')';
 
-unidade: '%' | 'deg' | 'rad' | 'f';
+time
+    : NUM_INT 'f'
+    | HOUR_FORMAT;
 
-composition: 'composition' ':' (decls+=decl_prop)+;
+expr
+    : ((NUM_INT | NUM_REAL) (OP_MATH (NUM_INT | NUM_REAL))*)(OP_MATH expr)*
+    | ('(' expr')');
 
-decl_prop: prop=IDENT '=' (valor | IDENT);
+composition
+    : 'composition' ':' (attrs+=decl_attr)+;
 
-elements: 'elements' ':' decl_element+;
+decl_attr
+    : attr OP_ATTRIB value;
 
-decl_element: IDENT_ELEMENTO '{' (decl_prop | decl_action | element)* '}';
+attr: IDENT ('.' IDENT)*;
 
-decl_action: 'action' IDENT '(' (IDENT (',' IDENT)*)? ')' '{' comando* '}';
+elements: 'elements' ':' (decls+=decl_element)+;
 
-action: IDENT '(' (expressao (',' expressao)*)? ')';
+decl_element: IDENT_DECL_ELEMENT '{' (decl_attr | decl_action | element_instance)* '}';
 
-element: IDENT_ELEMENTO IDENT (',' IDENT)*;
+decl_action: 'action' name=IDENT params '{' command* '}';
 
-atributo_element: IDENT '.' IDENT;
+params: '(' (IDENT (',' IDENT)*)? ')';
 
-op_atribuicao: '=' | '+=' | '-='| '*=';
+action_call: attr'(' (expr (',' expr)*)? ')';
 
-scene: 'scene' ':' (element)+;
+element_instance: IDENT_DECL_ELEMENT IDENT (',' IDENT)*;
+
+scene: 'scene' ':' (element_instance | decl_attr)+;
 
 storyboard:'storyboard' ':' keyframe*;
 
-keyframe: '['expressao']' ':' comando+;
+keyframe: '['time']' ':' (('start'|'stop') command)+;
 
-comando: IDENT '.' action '.' ('start' | 'stop');
+command: decl_attr | action_call;

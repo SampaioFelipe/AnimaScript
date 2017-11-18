@@ -2,6 +2,7 @@ package br.ufscar.dc.animaScript.utils;
 
 import java.util.BitSet;
 
+import br.ufscar.dc.animaScript.FinalCode;
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
@@ -12,14 +13,14 @@ import org.antlr.v4.runtime.dfa.DFA;
 
 public class ErrorParserListener implements ANTLRErrorListener {
 
-    private ResultadoParser saida;
+    private FinalCode saida;
 
-    public ErrorParserListener(ResultadoParser saida){
+    public ErrorParserListener(FinalCode saida){
         this.saida = saida;
     }
 
     public void syntaxError(Recognizer<?, ?> recognizer, Object o, int i, int i1, String s, RecognitionException e) {
-        if (!saida.isModificado()) {
+        if (!saida.isChanged()) {
             Token error_token = (Token) o;
             try {
                 saida.printErro(i, "erro sintatico proximo a " + error_token.getText().replace("<EOF>", "EOF"));
@@ -30,7 +31,7 @@ public class ErrorParserListener implements ANTLRErrorListener {
     }
 
     public void reportAmbiguity(Parser parser, DFA dfa, int i, int i1, boolean b, BitSet bitSet, ATNConfigSet atnConfigSet) {
-        if (!saida.isModificado()) {
+        if (!saida.isChanged()) {
             saida.printErro(i,"Ambiguidade [" + i + ":" + i1 + "]");
         }
     }

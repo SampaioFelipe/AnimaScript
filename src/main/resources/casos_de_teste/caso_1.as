@@ -5,10 +5,10 @@
 @description "Descrição da animação"
 
 composition:
-    width = 500
-    hight = 500
+    width = 600
+    height = 600
     fps = 30
-    duration = 1h10m15s
+    duration = 1h10m15s # 10f
     background = "#00000"
 
 elements:
@@ -44,6 +44,13 @@ elements:
         }
     }
 
+scene:
+    Sun sol
+
 storyboard:
-[0]:
-    moon()
+#[0]:
+    #addAction(terra.rotate_terra())
+    #addAction(jupiter.flip())
+#[20]:
+    #removeAction(jupiter.flip())
+
