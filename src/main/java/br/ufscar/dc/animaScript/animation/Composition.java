@@ -1,6 +1,6 @@
 package br.ufscar.dc.animaScript.animation;
 
-import br.ufscar.dc.animaScript.utils.AttributeList;
+import java.util.HashMap;
 
 public class Composition {
 
@@ -8,13 +8,25 @@ public class Composition {
     private int fps;
     private int durationSeconds;
 
-    private AttributeList attributes;
+    private HashMap<String, Attribute> attributes;
 
     public Composition() {
         this.width = 500;
         this.height = 500;
         this.fps = 25;
         this.durationSeconds = 60;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder state = new StringBuilder();
+
+        state.append("widht: " + this.getWidth() + "\n");
+        state.append("height: " + this.getHeight() + "\n");
+        state.append("FPS: " + this.getFPS() + "\n");
+        state.append("TotalFrame: " + this.getTotalFrames());
+
+        return state.toString();
     }
 
     public boolean addAttribute(Attribute attr) {

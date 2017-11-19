@@ -1,6 +1,9 @@
 package br.ufscar.dc.animaScript;
 
+import java.util.Map;
+
 import br.ufscar.dc.animaScript.animation.Animation;
+import br.ufscar.dc.animaScript.animation.Element;
 
 public class CodeGenerator {
 
@@ -10,13 +13,15 @@ public class CodeGenerator {
 
         this.animation = animation;
 
+        System.out.println(animation);
+
         StringBuffer html = new StringBuffer();
 
         html.append("<html>" +
                 "<head>" +
                 "<meta charset=\"utf-8\">");
 
-        html.append("<title>"+ animation.getTitle()+"</title>");
+        html.append("<title>" + animation.getTitle() + "</title>");
 
         html.append("<style media=\"screen\">" +
                 ".wrapper {" +
@@ -50,66 +55,78 @@ public class CodeGenerator {
 
         Main.out.printHtml(html.toString());
 
-        this.geraJs();
+//        this.geraJs();
     }
 
     public void geraJs() {
         StringBuffer js = new StringBuffer();
 
-        decodeComposicao(js);
+        decodeComposition(js);
 
-        decodeDeclaracoes(js);
+        decodedDeclElements(js);
 
         Main.out.printJS(js.toString());
 
         // Declaração dos elementos
     }
 
-    private void decodeDeclaracoes(StringBuffer buffer) {
-        buffer.append("var sun = new Image();\n" +
-                "sun.src = 'https://mdn.mozillademos.org/files/1456/Canvas_sun.png';\n" +
-                "var moon = new Image();\n" +
-                "moon.src = 'https://mdn.mozillademos.org/files/1443/Canvas_moon.png';\n" +
-                "var moon_speed_rotation = 0.05\n" +
-                "var earth = new Image();\n" +
-                "earth.src = 'https://mdn.mozillademos.org/files/1429/Canvas_earth.png';\n" +
-                "var earth_speed_rotation = 0.01\n" +
-                "// Inicialização das propriedades da animation\n" +
-                "function init() {\n" +
-                "  // Inicio da animação\n" +
-                "  window.requestAnimationFrame(draw);\n" +
-                "}\n" +
-                "function draw(timestamp) {\n" +
+    private void decodedDeclElements(StringBuffer buffer) {
+
+        buffer.append("// Declaração dos elementos\n" +
+                "class Element {\n" +
+                "  constructor() {\n" +
+                "    // this.x = x;\n" +
+                "    // this.y = y;\n" +
+                "    this.frames = {};\n" +
+                "    this.cur_actions = [];\n" +
+                "  }\n" +
+                "}\n");
+
+        for (Element decl : animation.getDecl_elements().values()) {
+            String image = decl.getName() + "_image";
+
+            buffer.append("var " + image + " = new Image();\n");
+            buffer.append(image + ".src = " + decl.getImage_path() + ";\n"); //TODO: devemos tratar a ordem
+
+            buffer.append("class " + decl.getName() + " extends Element {\n" +
+                    "  constructor() {\n" +
+                    "    super();\n" +
+                    "  }\n" +
+                    "  draw(ctx) {\n" + // TODO: temos que definir a função de desenho de acordo com os frames
+                    "    ctx.save();\n" +
+                    "    ctx.drawImage(" + image + ", 0, 0);\n" + //TODO: ajustar posicao de desenho no meio
+                    "    ctx.restore();\n" +
+                    "  }\n" +
+                    "}\n");
+        }
+
+        for (Map.Entry<String, Element> inst : animation.getInst_element().entrySet()) {
+            buffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "();\n");
+        }
+
+        //TODO: ajeita inicialização da animação
+        buffer.append("function init() {\n" +
+                "    // Inicio da animação\n" +
+                "    window.requestAnimationFrame(draw);\n" +
+                "}");
+
+        buffer.append("function draw(timestamp) {\n" +
                 "  update(timestamp);\n" +
-                "  ctx.clearRect(0, 0, width, height); // limpa o canvas\n" +
+                "  ctx.clearRect(0, 0," + animation.getComposition().getWidth() + ", " + animation.getComposition().getHeight() + ");\n" +
+                "  //Desenha-se as camadas superiores primeiro\n" +
                 "  ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';\n" +
-                "  ctx.strokeStyle = 'rgba(0, 153, 255, 0.4)';\n" +
-                "  ctx.save(); // salva o estado do canvas\n" +
-                "  ctx.translate(width/2, height/2); // translada o canvas para o meio (nova origem)\n" +
-                "  ctx.rotate(current_frame * earth_speed_rotation);\n" +
-                "  ctx.translate(105, 2);\n" +
-                "  ctx.fillRect(0, -12, 50, 24); // Shadow\n" +
-                "  ctx.rotate(current_frame * earth_speed_rotation);\n" +
-                "  ctx.drawImage(earth, -12, -12);\n" +
+                "  ctx.strokeStyle = 'rgba(0, 153, 255, 0.4)';\n");
+        for (String obj : animation.getInst_element().keySet()) {
+            buffer.append(obj + ".draw(ctx);\n");
+        }
 
-                "  ctx.save();\n" +
-                "  ctx.rotate(current_frame * moon_speed_rotation);\n" +
-                "  ctx.translate(0, 28.5);\n" +
-                "  ctx.drawImage(moon, -3.5, -3.5);\n" +
-                "  ctx.restore();\n" +
-
-                "  ctx.restore();\n" +
-                "  ctx.beginPath();\n" +
-                "  ctx.arc(width/2, height/2, 105, 0, Math.PI * 2, false); // Earth orbit\n" +
-                "  ctx.stroke();\n" +
-                "  ctx.drawImage(sun, 0, 0, width, height);\n" +
-                "  last_frame_update_time = timestamp;\n" +
+        buffer.append("last_frame_update_time = timestamp;\n" +
                 "  window.requestAnimationFrame(draw);\n" +
-                "}\n" +
-                "init();");
+                "}" +
+                "init();\n");
     }
 
-    private void decodeComposicao(StringBuffer buffer) {
+    private void decodeComposition(StringBuffer buffer) {
 
         // Declaração globais da animação
         buffer.append("var canvas = document.getElementById('canvas');\n" +

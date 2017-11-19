@@ -62,4 +62,8 @@ public class Element {
     public int getRotation() {
         return rotation;
     }
+
+    public String getImage_path() {
+        return image_path;
+    }
 }

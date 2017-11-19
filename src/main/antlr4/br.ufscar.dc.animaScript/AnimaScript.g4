@@ -23,6 +23,8 @@ OP_ATTRIB: '=' | '+=' | '-='| '*=';
 STRING : '"' ~('\n' | '\r' | '"')* '"';
 LOGIC_VAL : 'true' | 'false';
 
+OP_ACTION: 'start'|'stop';
+
 NUM_INT : DIGIT+;
 NUM_REAL : DIGIT+ '.' DIGIT+;
 
@@ -78,14 +80,14 @@ decl_action: 'action' name=IDENT params '{' command* '}';
 
 params: '(' (IDENT (',' IDENT)*)? ')';
 
-action_call: attr'(' (expr (',' expr)*)? ')';
+action_call: OP_ACTION attr'(' (expr (',' expr)*)? ')';
 
-element_instance: IDENT_DECL_ELEMENT IDENT (',' IDENT)*;
+element_instance: IDENT_DECL_ELEMENT idents+=IDENT (',' idents+=IDENT)*;
 
 scene: 'scene' ':' (element_instance | decl_attr)+;
 
 storyboard:'storyboard' ':' keyframe*;
 
-keyframe: '['time']' ':' (('start'|'stop') command)+;
+keyframe: '['time']' ':' cmds+=command+;
 
 command: decl_attr | action_call;

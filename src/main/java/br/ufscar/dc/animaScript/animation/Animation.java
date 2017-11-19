@@ -1,38 +1,108 @@
 package br.ufscar.dc.animaScript.animation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-
-import br.ufscar.dc.animaScript.utils.AttributeList;
+import java.util.Map;
 
 public class Animation {
 
     private Composition composition;
-    private AttributeList globals;
-    private HashMap<String, Element> elements;
+    private HashMap<String, Attribute> globals;
+
+    private HashMap<String, Element> decl_elements;
+    private HashMap<String, Element> inst_element;
+
+    private HashMap<String, ArrayList<Command>> frames;
 
     public Animation() {
-        this.globals = new AttributeList();
+        this.globals = new HashMap<String, Attribute>();
         this.composition = new Composition();
-        this.elements = new HashMap<String, Element>();
+
+        this.decl_elements = new HashMap<String, Element>();
+        this.inst_element = new HashMap<String, Element>();
+
+        this.frames = new HashMap<String, ArrayList<Command>>();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder state = new StringBuilder();
+        state.append("Animation:\n");
+
+        for (Map.Entry<String, Attribute> attr : this.globals.entrySet()) {
+            state.append(attr.getKey() + ": " + attr.getValue().getValue() + "\n");
+        }
+
+        state.append("\nComposition:\n" + this.composition.toString());
+
+        state.append("\n\nElements:\n");
+
+        for (Map.Entry<String, Element> element : this.decl_elements.entrySet()) {
+            state.append(element.getKey() + "\n");
+        }
+
+        state.append("\nScene:\n");
+
+        for (Map.Entry<String, Element> element : this.inst_element.entrySet()) {
+            state.append(element.getValue().getName() + " " + element.getKey() + "\n");
+        }
+
+        state.append("\nStoryboard\n");
+
+        for(Map.Entry<String, ArrayList<Command>> frame : this.frames.entrySet()) {
+            state.append(frame.getKey() + ":\n");
+
+            for(Command command: frame.getValue()){
+                state.append(command.toString() + "\n");
+            }
+        }
+
+        return state.toString();
     }
 
     public boolean addGlobalAttr(Attribute attr) {
-        if(attr.getName().startsWith("@")) {
+        if (attr.getName().startsWith("@")) {
             attr.setName(attr.getName().substring(1));
 
-            if(!globals.contains(attr.getName())){
-                globals.add(attr);
+            if (!globals.containsKey(attr.getName())) {
+                globals.put(attr.getName(), attr);
                 return true;
             } else {
                 Attribute attribute = globals.get(attr.getName());
                 attribute.setValue(attr.getValue());
 
                 System.err.println("Redefinição de atributo");
-                //TODO: relatar redefinição
+                //TODO: relatar redefinição (warnings)
             }
         }
 
         return false;
+    }
+
+    public boolean addDeclElement(Element element) {
+        if (!this.decl_elements.containsKey(element.getName())) {
+            this.decl_elements.put(element.getName(), element);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean addInstElement(String elementType, String name) {
+
+        if (this.decl_elements.containsKey(elementType)) {
+            // TODO: verificar se dois elementos com o msm nome
+            this.inst_element.put(name, this.decl_elements.get(elementType));
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean addFrame(String frame, ArrayList<Command> cmds) {
+        this.frames.put(frame, cmds); //TODO: identificar possiveis erros
+
+        return true;
     }
 
     public String getTitle() {
@@ -49,9 +119,17 @@ public class Animation {
         return composition;
     }
 
+    public HashMap<String, Element> getDecl_elements() {
+        return decl_elements;
+    }
+
+    public HashMap<String, Element> getInst_element() {
+        return inst_element;
+    }
+
     public boolean addElement(Element element) {
-        if(!this.elements.containsKey(element.getName())) {
-            this.elements.put(element.getName(), element);
+        if (!this.decl_elements.containsKey(element.getName())) {
+            this.decl_elements.put(element.getName(), element);
             return true;
         }
 

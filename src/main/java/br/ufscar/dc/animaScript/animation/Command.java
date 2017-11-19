@@ -1,31 +1,45 @@
 package br.ufscar.dc.animaScript.animation;
 
+import java.util.ArrayList;
+
 public class Command {
-    private Attribute attr;
-    private String operation;
 
-    public Command(Attribute attr, String operation) {
-        this.attr = attr;
-        this.operation = operation;
+    enum TYPE {
+        attr, action
     }
 
-    public void setAttr(Attribute attr) {
-        this.attr = attr;
+    private TYPE type;
+
+    private String identifier;
+
+    private String value_or_params;
+
+    private String op;
+
+    @Override
+    public String toString() {
+        StringBuilder state = new StringBuilder();
+
+        if (this.type == TYPE.attr) {
+            state.append(identifier + " " + op + " " + value_or_params);
+        } else {
+            state.append(op + " " + identifier + "("+ value_or_params +")");
+        }
+
+        return state.toString();
     }
 
-    public void setOperation(String operation) {
-        this.operation = operation;
+    public void buildAction(String op, String identifier, String params) {
+        this.type = TYPE.action;
+        this.op = op;
+        this.identifier = identifier;
+        this.value_or_params = params;
     }
 
-    public String getAttrName() {
-        return attr.getName();
-    }
-
-    public String getAttrValue() {
-        return attr.getValue();
-    }
-
-    public String getOperation() {
-        return operation;
+    public void buildAttribute(String identifier, String op, String value) {
+        this.type = TYPE.attr;
+        this.identifier = identifier;
+        this.op = op;
+        this.value_or_params = value;
     }
 }

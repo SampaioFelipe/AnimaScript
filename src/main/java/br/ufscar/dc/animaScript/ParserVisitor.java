@@ -1,8 +1,12 @@
 package br.ufscar.dc.animaScript;
 
+import java.util.ArrayList;
+
 import br.ufscar.dc.animaScript.animation.Animation;
 import br.ufscar.dc.animaScript.animation.Attribute;
+import br.ufscar.dc.animaScript.animation.Command;
 import br.ufscar.dc.animaScript.animation.Element;
+import org.antlr.v4.runtime.Token;
 
 public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
@@ -69,11 +73,52 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
             System.out.println(element_instance.getText());
         }
 
+        animation.addDeclElement(element);
+
         return super.visitDecl_element(ctx);
     }
 
     @Override
-    public Object visitElements(AnimaScriptParser.ElementsContext ctx) {
-        return super.visitElements(ctx);
+    public Object visitElement_instance(AnimaScriptParser.Element_instanceContext ctx) {
+
+        String elementType = ctx.IDENT_DECL_ELEMENT().getText();
+        String elementName;
+        for (Token ident : ctx.idents) {
+            elementName = ident.getText();
+            //TODO: lidar com os possíveis erros
+            animation.addInstElement(elementType, elementName);
+        }
+
+        return super.visitElement_instance(ctx);
+    }
+
+    @Override
+    public Object visitKeyframe(AnimaScriptParser.KeyframeContext ctx) {
+
+        ArrayList<Command> cmds = new ArrayList<Command>();
+
+        for (AnimaScriptParser.CommandContext cmdContext : ctx.cmds) {
+            Command cmd = new Command();
+            if (cmdContext.decl_attr() != null) {
+
+                cmd.buildAttribute(cmdContext.decl_attr().attr().getText(),
+                        cmdContext.decl_attr().OP_ATTRIB().getText(),
+                        cmdContext.decl_attr().value().getText()); // TODO: verificar tipo da operação
+            } else {
+                cmd.buildAction(cmdContext.action_call().OP_ACTION().getText(),
+                        cmdContext.action_call().attr().getText(), ""); //TODO: tratar os parametros
+            }
+
+            cmds.add(cmd);
+        }
+
+        animation.addFrame(ctx.time().getText(), cmds); // TODO: tratar conversão de frames
+
+        return super.visitKeyframe(ctx);
+    }
+
+    @Override
+    public Object visitCommand(AnimaScriptParser.CommandContext ctx) {
+        return super.visitCommand(ctx);
     }
 }
