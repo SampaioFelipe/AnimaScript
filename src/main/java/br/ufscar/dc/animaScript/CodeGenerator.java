@@ -54,8 +54,6 @@ public class CodeGenerator {
                 "</body></html>");
 
         Main.out.printHtml(html.toString());
-
-//        this.geraJs();
     }
 
     public void geraJs() {

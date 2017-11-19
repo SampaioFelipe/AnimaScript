@@ -12,7 +12,7 @@ public class Element {
     private int pos_x, pos_y;
     private int rotation;
 
-    AttributeList attributes;
+    HashMap<String, Attribute> attributes;
 
     HashMap<String, Element> children;
 
@@ -20,8 +20,13 @@ public class Element {
 
     public Element(String name) {
         this.name = name;
-        attributes = new AttributeList();
+        attributes = new HashMap<String, Attribute>();
         children = new HashMap<String, Element>();
+    }
+
+    public boolean addAttribute(Attribute attr) {
+        this.attributes.put(attr.getName(), attr);
+        return true;
     }
 
     public void setImage_path(String image_path) {
@@ -42,6 +47,7 @@ public class Element {
         this.width = width;
         this.height = height;
     }
+
 
     public void setRotation(int rotation) {
         this.rotation = rotation;
@@ -64,6 +70,6 @@ public class Element {
     }
 
     public String getImage_path() {
-        return image_path;
+        return this.attributes.get("image").getValue();
     }
 }

@@ -62,7 +62,9 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         Element element = new Element(ctx.IDENT_DECL_ELEMENT().getText());
 
         for (AnimaScriptParser.Decl_attrContext decl_attr : ctx.decl_attr()) {
-            System.out.println(decl_attr.getText());
+            Attribute attribute = (Attribute) visitDecl_attr(decl_attr);
+            System.out.println(attribute.getName());
+            element.addAttribute(attribute);
         }
 
         for (AnimaScriptParser.Decl_actionContext decl_action : ctx.decl_action()) {

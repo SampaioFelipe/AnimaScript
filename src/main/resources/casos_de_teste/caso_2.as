@@ -18,7 +18,7 @@ elements:
         image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_earth.png"
 
         # Elementos também possuem ações, que podem alterar suas propriedades
-        action tranlada() {
+        action translada() {
             position.x += 5
             position.y += 5
         }
