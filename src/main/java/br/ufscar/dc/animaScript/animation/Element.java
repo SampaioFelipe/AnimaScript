@@ -6,9 +6,6 @@ import java.util.HashMap;
 public class Element {
     private String name;
     private String image_path;
-    private int width, height;
-    private int pos_x, pos_y;
-    private float rotation;
     private HashMap<Integer, ArrayList<Command>> frames;
 
     private HashMap<String, Attribute> attributes;
@@ -27,23 +24,62 @@ public class Element {
 
     public Element(String name) {
         this.name = name;
-        attributes = new HashMap<String, Attribute>();
         children = new HashMap<String, String>();
         actions = new HashMap<String, Action>();
         frames = new HashMap<Integer, ArrayList<Command>>();
+
+        attributes = new HashMap<String, Attribute>();
+        // Definição dos atributos padrões
+        attributes.put("x", new Attribute("x", "0"));
+        attributes.put("y", new Attribute("y", "0"));
+        attributes.put("rotation", new Attribute("rotation", "0"));
+
+        attributes.put("width", new Attribute("width", "200")); // TODO: qual valor default?
+        attributes.put("height", new Attribute("height", "200")); // TODO: qual valor default?
     }
 
     public Element(Element old) {
         this.name = old.name;
-        attributes = old.attributes;
-        children = old.children;
-        actions = old.actions;
-        frames = old.frames;
+//        attributes = (HashMap<String, Attribute>) old.attributes.clone();
+
+        attributes = new HashMap<String, Attribute>();
+        // Definição dos atributos padrões
+        attributes.put("x", new Attribute("x", "0"));
+        attributes.put("y", new Attribute("y", "0"));
+        attributes.put("rotation", new Attribute("rotation", "0"));
+
+        attributes.put("width", new Attribute("width", "200")); // TODO: qual valor default?
+        attributes.put("height", new Attribute("height", "200")); // TODO: qual valor default?
+
+        children = (HashMap<String, String>) old.children.clone();
+        actions =  old.actions;
+        frames = new HashMap<Integer, ArrayList<Command>>();
     }
 
     public boolean addAttribute(Attribute attr) {
-        this.attributes.put(attr.getName(), attr);
-        return true;
+        if (attr.getName().equals("image")) {
+            setImage_path(attr.getValue());
+        } else {
+            if (this.attributes.containsKey(attr.getName())) {
+                Attribute attribute = this.attributes.get(attr.getName());
+                attribute.setValue(attr.getValue());
+            } else {
+                this.attributes.put(attr.getName(), attr);
+            }
+        }
+
+        return true; // TODO: verificar casos em que isso dá errado
+    }
+
+    public boolean changeAttribute(String name, String value) {
+
+        if (this.attributes.containsKey(name)) {
+            Attribute attr = this.attributes.get(name);
+            attr.setValue(value);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean addChild(Attribute child) {
@@ -57,22 +93,18 @@ public class Element {
     }
 
     public void addFrame(int frame, Command cmd) {
-//        this.frames.put(frame, cmd); // TODO: deve verificar se o frame já foi declarado e adicionar na lista de funçoes
+        if (this.frames.containsKey(frame)) {
+            ArrayList<Command> cmds = this.frames.get(frame);
+            cmds.add(cmd);
+        } else {
+            ArrayList<Command> cmds = new ArrayList<Command>();
+            cmds.add(cmd);
+            this.frames.put(frame, cmds);
+        }
     }
 
-    public void setPosition(int pos_x, int pos_y) {
-        this.pos_x = pos_x;
-        this.pos_y = pos_y;
-    }
-
-    public void setSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-
-    public void setRotation(int rotation) {
-        this.rotation = rotation;
+    public void setImage_path(String image_path) {
+        this.image_path = image_path;
     }
 
     public String getName() {
@@ -80,22 +112,30 @@ public class Element {
     }
 
     public int getHeight() {
-        return height;
+        return Integer.decode(this.attributes.get("height").getValue());
     }
 
     public int getWidth() {
-        return width;
+        return Integer.decode(this.attributes.get("width").getValue());
     }
 
     public float getRotation() {
-        return rotation;
+        return Float.parseFloat(this.attributes.get("rotation").getValue());
     }
 
     public String getImage_path() {
-        return this.attributes.get("image").getValue();
+        return this.image_path;
     }
 
     public HashMap<String, Action> getActions() {
         return actions;
+    }
+
+    public HashMap<String, Attribute> getAttributes() {
+        return attributes;
+    }
+
+    public HashMap<Integer, ArrayList<Command>> getFrames() {
+        return frames;
     }
 }

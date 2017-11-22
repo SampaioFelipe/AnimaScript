@@ -39,6 +39,16 @@ public class Command {
         return op;
     }
 
+    public int getOpId(){
+        if(this.op.equals("start")) {
+            return 0;
+        } else if(this.op.equals("stop")){
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
     public boolean isAttribute() {
         return this.type == TYPE.attr;
     }

@@ -114,7 +114,13 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         for(AnimaScriptParser.Decl_attrContext attrContext : ctx.decl_attr()) {
             Attribute att = (Attribute) visitDecl_attr(attrContext);
 
-            System.out.println(att.getName());
+            String[] attr_name = att.getName().split("\\.", 2);
+
+            Element element = animation.getInst_element().get(attr_name[0]); // TODO: verificar se o objeto realmente existe
+
+            System.out.println(element.getAttributes());
+            att.setName(attr_name[1]);
+            element.addAttribute(att); // TODO: verificar se a atribuição ocorreu com sucesso
         }
 
         return super.visitScene(ctx);

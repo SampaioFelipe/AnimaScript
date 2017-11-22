@@ -1,9 +1,11 @@
 package br.ufscar.dc.animaScript;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import br.ufscar.dc.animaScript.animation.Action;
 import br.ufscar.dc.animaScript.animation.Animation;
+import br.ufscar.dc.animaScript.animation.Attribute;
 import br.ufscar.dc.animaScript.animation.Command;
 import br.ufscar.dc.animaScript.animation.Element;
 
@@ -94,7 +96,7 @@ public class CodeGenerator {
                 "    ctx.save();\n" +
                 "    ctx.translate(this.x, this.y);\n" +
                 "    ctx.rotate(this.rotation);" + // TODO: temos que definir a função de desenho dos filhos
-                "    ctx.drawImage(" + image + ", 0, 0);\n" + //TODO: ajustar posicao de desenho no meio
+                "    ctx.drawImage(" + image + ", -12, -12);\n" + //TODO: ajustar posicao de desenho no meio
                 "    ctx.restore();\n" +
                 "  }\n");
 
@@ -193,7 +195,6 @@ public class CodeGenerator {
                 "    this.x = 0;\n" +
                 "    this.y = 0;\n" +
                 "    this.rotation = 0;\n" +
-                "    this.scale = 1;\n" +
                 "    this.frames = {};\n" +
                 "    this.last_frame = 0;\n" +
                 "    this.cur_actions = [];\n" +
@@ -229,12 +230,41 @@ public class CodeGenerator {
 
         for (Map.Entry<String, Element> inst : animation.getInst_element().entrySet()) {
             codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "();\n");
+            codeBuffer.append(inst.getKey()+".frames = {\n");
+
+            for(Map.Entry<Integer, ArrayList<Command>> cmds : inst.getValue().getFrames().entrySet()) {
+                codeBuffer.append(cmds.getKey() + ": [");
+                int j = 0;
+                for(Command cmd : cmds.getValue()) {
+                    //TODO: tratar quando o comando não for action
+                    codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", func:" + cmd.getIdentifier() + "}");
+
+                    if(j < cmds.getValue().size() - 1) {
+                        codeBuffer.append(",");
+                    }
+
+                    j++;
+                }
+
+                codeBuffer.append("],");
+            }
+            codeBuffer.append("}\n");
         }
 
-        //TODO: ajeita inicialização da animação
-        codeBuffer.append("function init() {\n" +
-                "    // Inicio da animação\n" +
-                "    window.requestAnimationFrame(draw);\n" +
+        //TODO: ajeitar inicialização da animação
+        codeBuffer.append("function init() {\n");
+
+        for (Map.Entry<String, Element> elementEntry : animation.getInst_element().entrySet()) {
+
+            for (Attribute attr : elementEntry.getValue().getAttributes().values()) {
+                codeBuffer.append(elementEntry.getKey() + "." + attr.getName() + "=" + attr.getValue() + ";\n");
+            }
+
+            codeBuffer.append(elementEntry.getKey()+".cur_actions = [];\n");
+
+        }
+
+        codeBuffer.append("window.requestAnimationFrame(draw);\n" +
                 "}");
 
         codeBuffer.append("function draw(timestamp) {\n" +

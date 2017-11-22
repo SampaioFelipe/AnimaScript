@@ -101,8 +101,9 @@ public class Animation {
         for (Command cmd: cmds) {
             // TODO: tratar quando não acha o "."
             String objName = cmd.getIdentifier().split("\\.")[0];
+            System.out.println("---------");
+            System.out.println(objName);
             if (this.inst_element.containsKey(objName)) {
-
                 Element obj = this.inst_element.get(objName);
                 obj.addFrame(Integer.decode(frame.split("f")[0]), cmd);
             } else {
