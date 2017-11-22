@@ -12,8 +12,6 @@ public class Animation {
     private HashMap<String, Element> decl_elements;
     private HashMap<String, Element> inst_element;
 
-    private HashMap<String, ArrayList<Command>> frames;
-
     public Animation() {
         this.globals = new HashMap<String, Attribute>();
         this.composition = new Composition();
@@ -21,7 +19,6 @@ public class Animation {
         this.decl_elements = new HashMap<String, Element>();
         this.inst_element = new HashMap<String, Element>();
 
-        this.frames = new HashMap<String, ArrayList<Command>>();
     }
 
     @Override
@@ -38,7 +35,7 @@ public class Animation {
         state.append("\n\nElements:\n");
 
         for (Map.Entry<String, Element> element : this.decl_elements.entrySet()) {
-            state.append(element.getKey() + "\n");
+            state.append(element.getValue().toString() + "\n");
         }
 
         state.append("\nScene:\n");
@@ -49,13 +46,13 @@ public class Animation {
 
         state.append("\nStoryboard\n");
 
-        for(Map.Entry<String, ArrayList<Command>> frame : this.frames.entrySet()) {
-            state.append(frame.getKey() + ":\n");
-
-            for(Command command: frame.getValue()){
-                state.append(command.toString() + "\n");
-            }
-        }
+//        for(Map.Entry<String, ArrayList<Command>> frame : this.frames.entrySet()) {
+//            state.append(frame.getKey() + ":\n");
+//
+//            for(Command command: frame.getValue()){
+//                state.append(command.toString() + "\n");
+//            }
+//        }
 
         return state.toString();
     }
@@ -89,10 +86,11 @@ public class Animation {
     }
 
     public boolean addInstElement(String elementType, String name) {
-
+        //TODO: tratar o caso em que não exite o tipo do elemento
         if (this.decl_elements.containsKey(elementType)) {
             // TODO: verificar se dois elementos com o msm nome
-            this.inst_element.put(name, this.decl_elements.get(elementType));
+            Element newInstance = new Element(this.decl_elements.get(elementType));
+            this.inst_element.put(name, newInstance);
             return true;
         }
 
@@ -100,7 +98,17 @@ public class Animation {
     }
 
     public boolean addFrame(String frame, ArrayList<Command> cmds) {
-        this.frames.put(frame, cmds); //TODO: identificar possiveis erros
+        for (Command cmd: cmds) {
+            // TODO: tratar quando não acha o "."
+            String objName = cmd.getIdentifier().split("\\.")[0];
+            if (this.inst_element.containsKey(objName)) {
+
+                Element obj = this.inst_element.get(objName);
+                obj.addFrame(Integer.decode(frame.split("f")[0]), cmd);
+            } else {
+                return false; //TODO: tratar o caso em que não encontrou o elemnto declarado
+            }
+        }
 
         return true;
     }
@@ -134,5 +142,9 @@ public class Animation {
         }
 
         return false;
+    }
+
+    public Element getInstElement(String name) {
+        return this.inst_element.get(name);
     }
 }

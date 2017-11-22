@@ -19,12 +19,12 @@ elements:
 
         # Elementos também possuem ações, que podem alterar suas propriedades
         action translada() {
-            position.x += 5
-            position.y += 5
+            x += 5
+            y += 5
         }
 
         action rotaciona() {
-            rotation += 10 deg
+            rotation += 10 #deg
         }
 
         action escala() {
@@ -34,7 +34,9 @@ elements:
 
 scene:
     Earth terra
-    terra.position = (15,15)
+#    terra.position = (15,15)
+    terra.x = 200
+    terra.y = 200
 
 storyboard:
 [0f]:

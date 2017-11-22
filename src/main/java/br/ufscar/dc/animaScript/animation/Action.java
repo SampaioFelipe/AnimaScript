@@ -4,11 +4,29 @@ import java.util.ArrayList;
 
 public class Action {
     String name;
+
     ArrayList<String> params;
-    ArrayList<Command> commands; // TODO: como representar os comandos?
+
+    ArrayList<Command> commands;
+
+    @Override
+    public String toString() {
+        StringBuilder state = new StringBuilder();
+
+        state.append("action " + name + "{\n");
+        for(Command cmd: commands) {
+            state.append(cmd + "\n");
+        }
+
+        state.append("\n}");
+
+        return state.toString();
+    }
 
     public Action(String name){
+        this.name = name;
         params = new ArrayList<String>();
+        commands = new ArrayList<Command>();
     }
 
     public boolean addParam(String param) {
@@ -22,5 +40,13 @@ public class Action {
 
     public void addCommand(Command command) {
         commands.add(command);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ArrayList<Command> getCommands() {
+        return commands;
     }
 }

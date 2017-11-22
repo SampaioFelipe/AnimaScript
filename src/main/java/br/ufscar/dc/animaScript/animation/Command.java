@@ -1,7 +1,5 @@
 package br.ufscar.dc.animaScript.animation;
 
-import java.util.ArrayList;
-
 public class Command {
 
     enum TYPE {
@@ -27,6 +25,26 @@ public class Command {
         }
 
         return state.toString();
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public String getValue_or_params() {
+        return value_or_params;
+    }
+
+    public String getOp() {
+        return op;
+    }
+
+    public boolean isAttribute() {
+        return this.type == TYPE.attr;
+    }
+
+    public boolean isCallAction() {
+        return this.type == TYPE.action;
     }
 
     public void buildAction(String op, String identifier, String params) {

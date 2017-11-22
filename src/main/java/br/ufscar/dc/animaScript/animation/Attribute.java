@@ -5,6 +5,10 @@ public class Attribute {
     private String type;
     private String value;
 
+    public Attribute(String name) {
+        this.name = name;
+    }
+
     public Attribute(String name, String value) {
         this.name = name;
         this.value = value;
@@ -18,11 +22,19 @@ public class Attribute {
         this.value = value;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
 
     public String getValue() {
         return value;
+    }
+
+    public String getType() {
+        return type;
     }
 }
