@@ -17,10 +17,22 @@ elements:
     {
         image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_earth.png"
 
+        Moon lua
         # Elementos também possuem ações, que podem alterar suas propriedades
+
+        action init(x,y){
+            lua.x = 200
+            x = 0
+            y = 0
+        }
+
         action translada() {
             x += 1
             y += 1
+        }
+
+        action deg_to_rad() {
+
         }
 
         action rotaciona() {
@@ -44,10 +56,10 @@ scene:
 storyboard:
 [0f]:
     start terra.rotaciona()
-
 [50f]:
     start terra2.translada()
-
+    terra.x = 10
+    terra.y = 10
 [100f]:
     start terra.translada()
 
@@ -57,12 +69,4 @@ storyboard:
 
 [200f]:
     stop terra.translada()
-
-
-
-#[0]:
-    #addAction(terra.rotate_terra())
-    #addAction(jupiter.flip())
-#[20]:
-    #removeAction(jupiter.flip())
 

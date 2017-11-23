@@ -49,6 +49,10 @@ public class Command {
         }
     }
 
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
     public boolean isAttribute() {
         return this.type == TYPE.attr;
     }

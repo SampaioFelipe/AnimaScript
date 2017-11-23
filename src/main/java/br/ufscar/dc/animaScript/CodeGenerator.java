@@ -199,26 +199,29 @@ public class CodeGenerator {
                 "    this.last_frame = 0;\n" +
                 "    this.cur_actions = [];\n" +
                 "  }\n" +
-                "  update(obj) {\n" +
+                "update(obj) {\n" +
                 "    var cur = obj.frames[current_frame];\n" +
                 "    if (typeof cur != 'undefined') {\n" +
                 "      for (var i = 0; i < cur.length; i++) {\n" +
                 "        if(cur[i].op == 0) { // adiciona\n" +
                 "          obj.cur_actions.push(cur[i])\n" +
-                "        } else {\n" +
+                "        } else if(cur[i].op == 1) {\n" +
+                "          \n" +
                 "          for(var j = obj.cur_actions.length - 1; j >= 0 ; j--) {\n" +
                 "            if(obj.cur_actions[j].id == cur[i].id) {\n" +
                 "              obj.cur_actions.splice(j,1);\n" +
                 "              break;\n" +
                 "            }\n" +
                 "          }\n" +
+                "        } else {\n" +
+                "          cur[i].func(obj);\n" +
                 "        }\n" +
                 "      }\n" +
                 "    }\n" +
                 "    for (var i = 0; i < obj.cur_actions.length; i++) {\n" +
                 "      obj.cur_actions[i].func(this);\n" +
                 "    }\n" +
-                "  }\n" +
+                "  }" +
                 "}");
 
         for (Element element : animation.getDecl_elements().values()) {
@@ -230,20 +233,31 @@ public class CodeGenerator {
 
         for (Map.Entry<String, Element> inst : animation.getInst_element().entrySet()) {
             codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "();\n");
-            codeBuffer.append(inst.getKey()+".frames = {\n");
+            codeBuffer.append(inst.getKey() + ".frames = {\n");
 
-            for(Map.Entry<Integer, ArrayList<Command>> cmds : inst.getValue().getFrames().entrySet()) {
+            for (Map.Entry<Integer, ArrayList<Command>> cmds : inst.getValue().getFrames().entrySet()) {
                 codeBuffer.append(cmds.getKey() + ": [");
-                int j = 0;
-                for(Command cmd : cmds.getValue()) {
+                String attributions = "";
+                for (Command cmd : cmds.getValue()) {
                     //TODO: tratar quando o comando não for action
-                    codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", func:" + cmd.getIdentifier() + "}");
 
-                    if(j < cmds.getValue().size() - 1) {
+                    if (cmd.getOpId() == 2) {
+                        attributions += "obj." + cmd.getIdentifier() + cmd.getOp() + cmd.getValue_or_params() + ";\n";
+                    } else {
+                        codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", " +
+                                "func:" + inst.getKey() + "." + cmd.getIdentifier() + "}");
                         codeBuffer.append(",");
                     }
 
-                    j++;
+//                    j++;
+                }
+
+                if (attributions.length() > 0) {
+                    codeBuffer.append("{op:2, func: function(obj){");
+
+                    codeBuffer.append(attributions);
+
+                    codeBuffer.append("}}");
                 }
 
                 codeBuffer.append("],");
@@ -260,8 +274,7 @@ public class CodeGenerator {
                 codeBuffer.append(elementEntry.getKey() + "." + attr.getName() + "=" + attr.getValue() + ";\n");
             }
 
-            codeBuffer.append(elementEntry.getKey()+".cur_actions = [];\n");
-
+            codeBuffer.append(elementEntry.getKey() + ".cur_actions = [];\n");
         }
 
         codeBuffer.append("window.requestAnimationFrame(draw);\n" +

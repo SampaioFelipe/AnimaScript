@@ -88,7 +88,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         for (AnimaScriptParser.Element_instanceContext instanceContext : ctx.element_instance()) {
             ArrayList<Attribute> elements = (ArrayList<Attribute>) visitElement_instance(instanceContext);
 
-            for(Attribute childElement : elements) {
+            for (Attribute childElement : elements) {
                 element.addChild(childElement);
             }
         }
@@ -104,14 +104,14 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         for (AnimaScriptParser.Element_instanceContext instanceContext : ctx.element_instance()) {
             ArrayList<Attribute> elements = (ArrayList<Attribute>) visitElement_instance(instanceContext);
 
-            for(Attribute childElement : elements) {
+            for (Attribute childElement : elements) {
                 System.out.println(childElement.getName());
                 animation.addInstElement(childElement.getType(), childElement.getName());
             }
         }
         // TODO: processar as decl_attr e atribuir ao objeto certo
 
-        for(AnimaScriptParser.Decl_attrContext attrContext : ctx.decl_attr()) {
+        for (AnimaScriptParser.Decl_attrContext attrContext : ctx.decl_attr()) {
             Attribute att = (Attribute) visitDecl_attr(attrContext);
 
             String[] attr_name = att.getName().split("\\.", 2);

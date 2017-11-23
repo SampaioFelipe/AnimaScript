@@ -100,14 +100,15 @@ public class Animation {
     public boolean addFrame(String frame, ArrayList<Command> cmds) {
         for (Command cmd: cmds) {
             // TODO: tratar quando não acha o "."
-            String objName = cmd.getIdentifier().split("\\.")[0];
+            String[] identifiers = cmd.getIdentifier().split("\\.");
             System.out.println("---------");
-            System.out.println(objName);
-            if (this.inst_element.containsKey(objName)) {
-                Element obj = this.inst_element.get(objName);
+            System.out.println(identifiers[0]);
+            if (this.inst_element.containsKey(identifiers[0])) {
+                Element obj = this.inst_element.get(identifiers[0]);
+                cmd.setIdentifier(identifiers[1]);
                 obj.addFrame(Integer.decode(frame.split("f")[0]), cmd);
             } else {
-                return false; //TODO: tratar o caso em que não encontrou o elemnto declarado
+                return false; //TODO: tratar o caso em que não encontrou o elemento declarado
             }
         }
 
