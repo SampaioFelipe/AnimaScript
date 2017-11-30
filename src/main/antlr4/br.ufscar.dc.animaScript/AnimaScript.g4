@@ -18,7 +18,9 @@ fragment UPPER_CASE: ('A'..'Z');
 UNIT: '%' | 'deg' | 'rad';
 
 OP_MATH: ('+'|'-'|'*'|'/');
-OP_ATTRIB: '=' | '+=' | '-='| '*=';
+OP_ATTRIB: '=';
+
+OP_ATTRIB2: '+=' | '-='| '*=';
 
 STRING : '"' ~('\n' | '\r' | '"')* '"';
 LOGIC_VAL : 'true' | 'false';
@@ -65,9 +67,12 @@ expr
     | ('(' expr')');
 
 composition
-    : 'composition' ':' (attrs+=decl_attr)+;
+    : 'composition' ':' (attrs+=decl_attr_comp)+;
 
 decl_attr
+    : attr (OP_ATTRIB|OP_ATTRIB2) value;
+
+decl_attr_comp
     : attr OP_ATTRIB value;
 
 attr: IDENT ('.' IDENT)*;
