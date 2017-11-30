@@ -172,11 +172,17 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         }
         if(ctx.time().getText().contains("m")){
             String tempo = ctx.time().getText().split("m")[0];
-            frames += fps * 60 * Integer.parseInt(tempo.split("h")[1]);
+            if(tempo.contains("h"))
+                frames += fps * 60 * Integer.parseInt(tempo.split("h")[1]);
+            else
+                frames += fps * 60 * Integer.parseInt(tempo);
         }
         if(ctx.time().getText().contains("s")){
             String tempo = ctx.time().getText().split("s")[0];
-            frames += fps * Integer.parseInt(tempo.split("h")[1].split("m")[1]);
+            if(tempo.contains("m"))
+                frames += fps *  Integer.parseInt(tempo.split("m")[1]);
+            else
+                frames += fps * Integer.parseInt(tempo);
         }
 
         if(ctx.time().getText().contains("f")){
@@ -186,8 +192,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
             animation.addFrame(Integer.toString(frames)+"f", cmds);
         }
 
-        //animation.addFrame(ctx.time().getText(), cmds); // TODO: tratar conversão de frames para casos em que não tem hora e/ou minuto
-
+        //animation.addFrame(ctx.time().getText(), cmds);
         return super.visitKeyframe(ctx);
     }
 
