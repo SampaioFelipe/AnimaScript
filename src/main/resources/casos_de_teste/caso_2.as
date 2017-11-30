@@ -56,7 +56,7 @@ scene:
 storyboard:
 [0f]:
     start terra.rotaciona()
-[50f]:
+[00h30m30s]:
     start terra2.translada()
     terra.x = 10
     terra.y = 10

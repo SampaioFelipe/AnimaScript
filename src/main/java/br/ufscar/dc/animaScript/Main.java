@@ -3,6 +3,8 @@ package br.ufscar.dc.animaScript;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import br.ufscar.dc.animaScript.AnimaScriptParser;
+import br.ufscar.dc.animaScript.AnimaScriptLexer;
 import br.ufscar.dc.animaScript.animation.Animation;
 import br.ufscar.dc.animaScript.animation.Composition;
 import br.ufscar.dc.animaScript.utils.ErrorParserListener;

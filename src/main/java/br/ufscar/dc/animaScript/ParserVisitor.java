@@ -2,6 +2,8 @@ package br.ufscar.dc.animaScript;
 
 import java.util.ArrayList;
 
+import br.ufscar.dc.animaScript.AnimaScriptBaseVisitor;
+import br.ufscar.dc.animaScript.AnimaScriptParser;
 import br.ufscar.dc.animaScript.animation.Action;
 import br.ufscar.dc.animaScript.animation.Animation;
 import br.ufscar.dc.animaScript.animation.Attribute;
@@ -42,8 +44,8 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitComposition(AnimaScriptParser.CompositionContext ctx) {
-        for (AnimaScriptParser.Decl_attrContext attr : ctx.attrs) {
-            Attribute attribute = (Attribute) visitDecl_attr(attr);
+        for (AnimaScriptParser.Decl_attr_compContext attr : ctx.attrs) {
+            Attribute attribute = (Attribute) visitDecl_attr_comp(attr);
 
             animation.getComposition().addAttribute(attribute);
         }
@@ -52,6 +54,14 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitDecl_attr(AnimaScriptParser.Decl_attrContext ctx) {
+
+        //TODO: temos que ver o tipo de atribuicao, o que fazer com ela?
+
+        return new Attribute(ctx.attr().getText(), ctx.value().getText());
+    }
+
+    @Override
+    public Object visitDecl_attr_comp(AnimaScriptParser.Decl_attr_compContext ctx) {
 
         //TODO: temos que ver o tipo de atribuicao, o que fazer com ela?
 
@@ -152,8 +162,31 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
             cmds.add((Command) visitCommand(cmdContext));
         }
+        System.out.println("TESTE: " + ctx.time().getText());
 
-        animation.addFrame(ctx.time().getText(), cmds); // TODO: tratar conversão de frames
+        Integer frames = 0;
+        Integer fps = animation.getComposition().getFPS();
+
+        if(ctx.time().getText().contains("h")){
+            frames += fps * 360 * Integer.parseInt(ctx.time().getText().split("h")[0]);
+        }
+        if(ctx.time().getText().contains("m")){
+            String tempo = ctx.time().getText().split("m")[0];
+            frames += fps * 60 * Integer.parseInt(tempo.split("h")[1]);
+        }
+        if(ctx.time().getText().contains("s")){
+            String tempo = ctx.time().getText().split("s")[0];
+            frames += fps * Integer.parseInt(tempo.split("h")[1].split("m")[1]);
+        }
+
+        if(ctx.time().getText().contains("f")){
+            animation.addFrame(ctx.time().getText(), cmds);
+        } else {
+            System.out.println(frames);
+            animation.addFrame(Integer.toString(frames)+"f", cmds);
+        }
+
+        //animation.addFrame(ctx.time().getText(), cmds); // TODO: tratar conversão de frames para casos em que não tem hora e/ou minuto
 
         return super.visitKeyframe(ctx);
     }
@@ -163,9 +196,16 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         Command cmd = new Command();
         if (ctx.decl_attr() != null) {
 
-            cmd.buildAttribute(ctx.decl_attr().attr().getText(),
-                    ctx.decl_attr().OP_ATTRIB().getText(),
-                    ctx.decl_attr().value().getText()); // TODO: verificar tipo da operação
+            if(ctx.decl_attr().OP_ATTRIB() != null) {
+                cmd.buildAttribute(ctx.decl_attr().attr().getText(),
+                        ctx.decl_attr().OP_ATTRIB().getText(),
+                        ctx.decl_attr().value().getText()); // TODO: verificar tipo da operação
+            } else {
+                cmd.buildAttribute(ctx.decl_attr().attr().getText(),
+                        ctx.decl_attr().OP_ATTRIB2().getText(),
+                        ctx.decl_attr().value().getText()); // TODO: verificar tipo da operação
+
+            }
         } else {
             cmd.buildAction(ctx.action_call().OP_ACTION().getText(),
                     ctx.action_call().attr().getText(), ""); //TODO: tratar os parametros

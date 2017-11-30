@@ -129,6 +129,8 @@ public class Animation {
         return composition;
     }
 
+    public HashMap<String, Attribute> getGlobals() { return globals;}
+
     public HashMap<String, Element> getDecl_elements() {
         return decl_elements;
     }
