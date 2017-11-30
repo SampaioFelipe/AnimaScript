@@ -145,6 +145,31 @@ public class Animation {
 
         return false;
     }
+    public String horas2frames(String horas){
+
+        Integer frames = 0;
+        Integer fps = this.getComposition().getFPS();
+
+        if(horas.contains("h")){
+            frames += fps * 360 * Integer.parseInt(horas.split("h")[0]);
+        }
+        if(horas.contains("m")){
+            String tempo = horas.split("m")[0];
+            if(tempo.contains("h"))
+                frames += fps * 60 * Integer.parseInt(tempo.split("h")[1]);
+            else
+                frames += fps * 60 * Integer.parseInt(tempo);
+        }
+        if(horas.contains("s")){
+            String tempo = horas.split("s")[0];
+            if(tempo.contains("m"))
+                frames += fps *  Integer.parseInt(tempo.split("m")[1]);
+            else
+                frames += fps * Integer.parseInt(tempo);
+        }
+
+        return Integer.toString(frames)+"f";
+    }
 
     public Element getInstElement(String name) {
         return this.inst_element.get(name);

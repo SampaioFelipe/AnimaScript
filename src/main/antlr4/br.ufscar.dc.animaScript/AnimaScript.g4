@@ -18,8 +18,8 @@ fragment UPPER_CASE: ('A'..'Z');
 UNIT: '%' | 'deg' | 'rad';
 
 OP_MATH: ('+'|'-'|'*'|'/');
-OP_ATTRIB: '=';
 
+OP_ATTRIB: '=';
 OP_ATTRIB2: '+=' | '-='| '*=';
 
 STRING : '"' ~('\n' | '\r' | '"')* '"';

@@ -45,6 +45,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
     @Override
     public Object visitComposition(AnimaScriptParser.CompositionContext ctx) {
         for (AnimaScriptParser.Decl_attr_compContext attr : ctx.attrs) {
+
             Attribute attribute = (Attribute) visitDecl_attr_comp(attr);
 
             animation.getComposition().addAttribute(attribute);
@@ -65,7 +66,14 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         //TODO: temos que ver o tipo de atribuicao, o que fazer com ela?
 
-        return new Attribute(ctx.attr().getText(), ctx.value().getText());
+        if (ctx.value().time() != null) {
+            if(ctx.value().time().HOUR_FORMAT() != null)
+                return new Attribute(ctx.attr().getText(), animation.horas2frames(ctx.value().getText()));
+            else
+                return new Attribute(ctx.attr().getText(), ctx.value().getText());
+        } else {
+            return new Attribute(ctx.attr().getText(), ctx.value().getText());
+        }
     }
 
     @Override
@@ -153,34 +161,13 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
             cmds.add((Command) visitCommand(cmdContext));
         }
-        System.out.println("TESTE: " + ctx.time().getText());
 
-        Integer frames = 0;
-        Integer fps = animation.getComposition().getFPS();
 
-        if(ctx.time().getText().contains("h")){
-            frames += fps * 360 * Integer.parseInt(ctx.time().getText().split("h")[0]);
-        }
-        if(ctx.time().getText().contains("m")){
-            String tempo = ctx.time().getText().split("m")[0];
-            if(tempo.contains("h"))
-                frames += fps * 60 * Integer.parseInt(tempo.split("h")[1]);
-            else
-                frames += fps * 60 * Integer.parseInt(tempo);
-        }
-        if(ctx.time().getText().contains("s")){
-            String tempo = ctx.time().getText().split("s")[0];
-            if(tempo.contains("m"))
-                frames += fps *  Integer.parseInt(tempo.split("m")[1]);
-            else
-                frames += fps * Integer.parseInt(tempo);
-        }
 
-        if(ctx.time().getText().contains("f")){
+        if(ctx.time().NUM_INT() != null){
             animation.addFrame(ctx.time().getText(), cmds);
         } else {
-            System.out.println(frames);
-            animation.addFrame(Integer.toString(frames)+"f", cmds);
+            animation.addFrame(animation.horas2frames(ctx.time().getText()), cmds);
         }
 
         //animation.addFrame(ctx.time().getText(), cmds);
