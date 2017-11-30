@@ -54,6 +54,7 @@ public class FinalCode {
     public void printErro(int linha, String erro) {
         if (!changed)
             changed = true;
+
         parserResult.append("Linha " + String.valueOf(linha) + ": ");
         parserResult.append(erro);
         parserResult.append("\n");
@@ -75,8 +76,18 @@ public class FinalCode {
 
     public void generate() {
 
-            // Grava no arquivo de saida o resultado da compilacao
-            try {
+        // Grava no arquivo de saida o resultado da compilacao
+        try {
+
+            if (isChanged()) {
+                File file_erro = new File(outputFolderName + "/error.html");
+                file_erro.getParentFile().mkdirs();
+                file_erro.createNewFile();
+                PrintWriter pw = new PrintWriter(new FileWriter(file_erro));
+                pw.print(parserResult);
+                pw.flush();
+                pw.close();
+            } else {
                 File file_html = new File(outputFolderName + "/main.html");
                 file_html.getParentFile().mkdirs();
                 file_html.createNewFile();
@@ -91,9 +102,10 @@ public class FinalCode {
                 pw.print(getOutputJs());
                 pw.flush();
                 pw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

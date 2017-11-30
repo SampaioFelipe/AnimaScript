@@ -7,6 +7,7 @@ public class Composition {
     private int width, height;
     private int fps;
     private int durationSeconds;
+    private String bgcolor;
 
     private HashMap<String, Attribute> attributes;
 
@@ -15,6 +16,7 @@ public class Composition {
         this.height = 500;
         this.fps = 25;
         this.durationSeconds = 60;
+        this.bgcolor = "'#ffffff'";
     }
 
     @Override
@@ -31,6 +33,7 @@ public class Composition {
 
     public boolean addAttribute(Attribute attr) {
         String name = attr.getName();
+
         if (name.equals("width")) {
             setWidth(Integer.decode(attr.getValue()));
         } else if (name.equals("height")) {
@@ -39,6 +42,10 @@ public class Composition {
             setFps(Integer.decode(attr.getValue()));
         } else if (name.equals("duration")) {
             setDuration(attr.getValue());
+        } else if (name.equals("background")) {
+            setBgcolor(attr.getValue());
+        } else {
+            this.attributes.put(name, attr);
         }
 
         return true;
@@ -61,6 +68,10 @@ public class Composition {
 //        this.durationSeconds ;
     }
 
+    public void setBgcolor(String bgcolor) {
+        this.bgcolor = bgcolor;
+    }
+
     public void setDurationSeconds(int durationSeconds) {
         this.durationSeconds = durationSeconds;
     }
@@ -79,5 +90,13 @@ public class Composition {
 
     public int getFPS() {
         return this.fps;
+    }
+
+    public String getBgcolor() {
+        return bgcolor;
+    }
+
+    public Attribute getAttribute(String identfier) {
+        return this.attributes.get(identfier);
     }
 }

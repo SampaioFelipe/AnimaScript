@@ -135,7 +135,8 @@ public class CodeGenerator {
                 "canvas.width = width;\n" +
                 "canvas.height = height;\n" +
                 "var ctx = canvas.getContext(\"2d\");\n" +
-                "ctx.globalCompositeOperation = 'destination-over';\n");
+                "ctx.globalCompositeOperation = 'destination-over';\n" +
+                "ctx.fillStyle = " + animation.getComposition().getBgcolor() + ";");
 
         // Controles de tempo
         codeBuffer.append("var current_frame = -1;\n" +
@@ -189,8 +190,7 @@ public class CodeGenerator {
 
     private void decodedDeclElements() {
 
-        codeBuffer.append("// Declaração dos elementos\n" +
-                "class Element {\n" +
+        codeBuffer.append("class Element {\n" +
                 "  constructor() {\n" +
                 "    this.x = 0;\n" +
                 "    this.y = 0;\n" +
@@ -203,7 +203,7 @@ public class CodeGenerator {
                 "    var cur = obj.frames[current_frame];\n" +
                 "    if (typeof cur != 'undefined') {\n" +
                 "      for (var i = 0; i < cur.length; i++) {\n" +
-                "        if(cur[i].op == 0) { // adiciona\n" +
+                "        if(cur[i].op == 0) {\n" +
                 "          obj.cur_actions.push(cur[i])\n" +
                 "        } else if(cur[i].op == 1) {\n" +
                 "          \n" +
@@ -248,8 +248,6 @@ public class CodeGenerator {
                                 "func:" + inst.getKey() + "." + cmd.getIdentifier() + "}");
                         codeBuffer.append(",");
                     }
-
-//                    j++;
                 }
 
                 if (attributions.length() > 0) {
@@ -289,6 +287,7 @@ public class CodeGenerator {
         }
 
         codeBuffer.append("}\n" +
+                "ctx.fillRect(0,0," + animation.getComposition().getWidth() + ", " + animation.getComposition().getHeight() + ");" +
                 "last_frame_update_time = timestamp;\n" +
                 "    if(!paused) {\n" +
                 "      window.requestAnimationFrame(draw);\n" +
