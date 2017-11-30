@@ -89,7 +89,7 @@ action_call: OP_ACTION attr'(' (expr (',' expr)*)? ')';
 
 element_instance: IDENT_DECL_ELEMENT idents+=IDENT (',' idents+=IDENT)*;
 
-scene: 'scene' ':' (element_instance | decl_attr)+;
+scene: 'scene' ':' (element_instance)+;
 
 storyboard:'storyboard' ':' keyframe*;
 

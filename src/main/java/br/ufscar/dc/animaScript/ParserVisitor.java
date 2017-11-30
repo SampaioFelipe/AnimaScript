@@ -121,18 +121,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         }
         // TODO: processar as decl_attr e atribuir ao objeto certo
 
-        for (AnimaScriptParser.Decl_attrContext attrContext : ctx.decl_attr()) {
-            Attribute att = (Attribute) visitDecl_attr(attrContext);
-
-            String[] attr_name = att.getName().split("\\.", 2);
-
-            Element element = animation.getInst_element().get(attr_name[0]); // TODO: verificar se o objeto realmente existe
-
-            System.out.println(element.getAttributes());
-            att.setName(attr_name[1]);
-            element.addAttribute(att); // TODO: verificar se a atribuição ocorreu com sucesso
-        }
-
         return super.visitScene(ctx);
     }
 
@@ -141,13 +129,16 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         ArrayList<Attribute> elements = new ArrayList<Attribute>();
 
         String elementType = ctx.IDENT_DECL_ELEMENT().getText();
-        // TODO: Verificar se já foi declarado antes o tipo
+        if(animation.getDecl_elements().containsKey(elementType)) {
 
-        for (Token ident : ctx.idents) {
-            Attribute attr = new Attribute(ident.getText());
-            attr.setType(elementType);
-            elements.add(attr);
-            //TODO: lidar com os possíveis erros ()
+            for (Token ident : ctx.idents) {
+                Attribute attr = new Attribute(ident.getText());
+                attr.setType(elementType);
+                elements.add(attr);
+                //TODO: lidar com os possíveis erros ()
+            }
+        } else {
+            Main.out.printErro(0, "Elemento \"" + elementType +  "\" não declarado");
         }
 
         return elements;
