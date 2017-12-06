@@ -78,15 +78,8 @@ public class FinalCode {
 
         // Grava no arquivo de saida o resultado da compilacao
         try {
-
             if (isChanged()) {
-                File file_erro = new File(outputFolderName + "/error.html");
-                file_erro.getParentFile().mkdirs();
-                file_erro.createNewFile();
-                PrintWriter pw = new PrintWriter(new FileWriter(file_erro));
-                pw.print(parserResult);
-                pw.flush();
-                pw.close();
+                System.err.println(parserResult);
             } else {
                 File file_html = new File(outputFolderName + "/main.html");
                 file_html.getParentFile().mkdirs();

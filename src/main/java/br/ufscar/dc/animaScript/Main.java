@@ -18,7 +18,6 @@ public class Main {
     public static void main(String[] args) {
 
         if (validateArgs(args)) {
-            System.out.println(out.getInputName());
             try {
                 // Abre o arquivo com o codigo a ser compilado
                 ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(out.getInputName()));
@@ -30,6 +29,7 @@ public class Main {
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 AnimaScriptParser parser = new AnimaScriptParser(tokens);
 
+//                parser.removeErrorListeners();
                 // Adiciona estrutra para a manipulação de erros sintaticos
                 parser.addErrorListener(new ErrorParserListener(out));
 
@@ -48,12 +48,6 @@ public class Main {
                         CodeGenerator codeGenerator = new CodeGenerator(animation);
                         codeGenerator.geraJs();
                     }
-                } else {
-                    // Se houve algum erro lexico ele estara em lexicalErro
-//                    if (lexicalError != null) {
-//                        out.conteudo = new StringBuffer();
-//                        out.println(lexicalError);
-//                    }
                 }
             } catch (FileNotFoundException pce) {
                 if (pce.getMessage() != null) {

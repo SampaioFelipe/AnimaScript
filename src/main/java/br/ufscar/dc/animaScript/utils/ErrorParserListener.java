@@ -23,6 +23,7 @@ public class ErrorParserListener implements ANTLRErrorListener {
         if (!saida.isChanged()) {
             Token error_token = (Token) o;
             try {
+                // TODO: Falar com o professor sobre as mensagens de erro
                 saida.printErro(i, "erro sintatico proximo a " + error_token.getText().replace("<EOF>", "EOF"));
             } catch (NullPointerException exception) {
                 exception.printStackTrace();

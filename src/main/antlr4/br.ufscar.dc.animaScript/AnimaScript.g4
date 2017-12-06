@@ -15,7 +15,7 @@ fragment LOWER_CASE: ('a'..'z');
 
 fragment UPPER_CASE: ('A'..'Z');
 
-UNIT: '%' | 'deg' | 'rad';
+//UNIT: '%' | 'deg' | 'rad';
 
 OP_MATH: ('+'|'-'|'*'|'/');
 
@@ -40,8 +40,7 @@ COMMENT : '#' ~('\n')* -> skip;
 WHITE_SPACE :	(' ' | '\t' | '\r' | '\n') -> skip;
 
 // Caso haja qualquer caracter que nao pertenca a gramatica, e indentificado como um erro lexico
-//ERROR: . {Main.lexicalError = "Linha "+getLine()+": "+getText()+" - simbolo nao identificado";};
-// O mesmo acontece caso o haja algum COMMENT nao fechado
+ERROR: . {Main.out.printErro(getLine(), getText() + "- simbolo nao identificado");};
 
 program
     : decl_global composition elements scene storyboard;
@@ -53,7 +52,7 @@ value
     : STRING | time | num_value | position;
 
 num_value
-    : (expr | IDENT) UNIT?;
+    : (expr | IDENT);
 
 position
     : '(' num_value ',' num_value ')';
@@ -75,24 +74,33 @@ decl_attr
 decl_attr_comp
     : attr OP_ATTRIB value;
 
-attr: IDENT ('.' IDENT)*;
+attr:
+    IDENT ('.' IDENT)*;
 
-elements: 'elements' ':' (decls+=decl_element)+;
+elements:
+    'elements' ':' (decls+=decl_element)+;
 
-decl_element: IDENT_DECL_ELEMENT '{' (decl_attr | decl_action | element_instance)* '}';
+decl_element:
+    IDENT_DECL_ELEMENT '{' (decl_attr | decl_action | element_instance)* '}';
 
-decl_action: 'action' name=IDENT params '{' command* '}';
+decl_action:
+    'action' name=IDENT '(' (params+=IDENT (',' params+=IDENT)*)? ')' '{' command* '}';
 
-params: '(' (IDENT (',' IDENT)*)? ')';
+action_call:
+    OP_ACTION attr'(' (params+=expr (',' params+=expr)*)? ')';
 
-action_call: OP_ACTION attr'(' (expr (',' expr)*)? ')';
+element_instance:
+    IDENT_DECL_ELEMENT name=IDENT '('(params+=expr(',' params+=expr)*)?')';
 
-element_instance: IDENT_DECL_ELEMENT idents+=IDENT (',' idents+=IDENT)*;
+scene:
+    'scene' ':' (element_instance)+;
 
-scene: 'scene' ':' (element_instance)+;
+storyboard:
+    'storyboard' ':' keyframe*;
 
-storyboard:'storyboard' ':' keyframe*;
+keyframe:
+    '['time']' ':' cmds+=command+;
 
-keyframe: '['time']' ':' cmds+=command+;
-
-command: decl_attr | action_call;
+command:
+    decl_attr
+    | action_call;

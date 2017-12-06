@@ -10,9 +10,13 @@ public class Element {
 
     private HashMap<String, Attribute> attributes;
 
-    private HashMap<String, String> children;
+    private HashMap<String, Command> children;
 
     private HashMap<String, Action> actions;
+
+    private int numberParamsConstructor;
+
+    private String initParams;
 
     @Override
     public String toString() {
@@ -24,7 +28,7 @@ public class Element {
 
     public Element(String name) {
         this.name = name;
-        children = new HashMap<String, String>();
+        children = new HashMap<String, Command>();
         actions = new HashMap<String, Action>();
         frames = new HashMap<Integer, ArrayList<Command>>();
 
@@ -36,24 +40,23 @@ public class Element {
 
         attributes.put("width", new Attribute("width", "200")); // TODO: qual valor default?
         attributes.put("height", new Attribute("height", "200")); // TODO: qual valor default?
+
+        this.numberParamsConstructor = 0;
+        this.initParams = "";
     }
 
     public Element(Element old) {
         this.name = old.name;
-//        attributes = (HashMap<String, Attribute>) old.attributes.clone();
 
         attributes = new HashMap<String, Attribute>();
         // Definição dos atributos padrões
-        attributes.put("x", new Attribute("x", "0"));
-        attributes.put("y", new Attribute("y", "0"));
-        attributes.put("rotation", new Attribute("rotation", "0"));
+        attributes = (HashMap<String, Attribute>) old.attributes.clone();
+        children = (HashMap<String, Command>) old.children.clone();
 
-        attributes.put("width", new Attribute("width", "200")); // TODO: qual valor default?
-        attributes.put("height", new Attribute("height", "200")); // TODO: qual valor default?
-
-        children = (HashMap<String, String>) old.children.clone();
-        actions =  old.actions;
+        actions = old.actions;
         frames = new HashMap<Integer, ArrayList<Command>>();
+        this.numberParamsConstructor = old.numberParamsConstructor;
+        this.initParams = old.initParams;
     }
 
     public boolean addAttribute(Attribute attr) {
@@ -82,14 +85,53 @@ public class Element {
         return false;
     }
 
-    public boolean addChild(Attribute child) {
-        this.children.put(child.getName(), child.getType());
-        return true; //TODO: verificar se não existe já a msm chave
+    public boolean setInitParams(ArrayList<String> params) {
+        if (params.size() == this.numberParamsConstructor) {
+            this.initParams = params.get(0);
+
+            for (int i = 1; i < params.size(); i++) {
+                this.initParams += "," + params.get(i);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
-    public void addAction(Action action) {
-        this.actions.put(action.name, action);
-        //TODO: tratar actions duplicadas
+    public void setInitParams(String params) {
+        this.initParams = params;
+    }
+
+    public String getInitParams() {
+        return initParams;
+    }
+
+    public boolean addChild(Command child) {
+
+        if (!this.children.containsKey(child.getIdentifier())) {
+            this.children.put(child.getIdentifier(), child);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean addAction(Action action) {
+
+        if (!this.getActions().containsKey(action.getName())) {
+
+            if (action.getName().equals("init")) {
+                this.numberParamsConstructor = action.getNumberParams();
+                this.initParams = action.getParams();
+            }
+
+            this.actions.put(action.getName(), action);
+
+            return true;
+        }
+
+        return false;
     }
 
     public void addFrame(int frame, Command cmd) {
@@ -137,5 +179,13 @@ public class Element {
 
     public HashMap<Integer, ArrayList<Command>> getFrames() {
         return frames;
+    }
+
+    public HashMap<String, Command> getChildren() {
+        return children;
+    }
+
+    public int getNumberParamsConstructor() {
+        return numberParamsConstructor;
     }
 }

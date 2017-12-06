@@ -6,7 +6,7 @@ public class Composition {
 
     private int width, height;
     private int fps;
-    private int durationSeconds;
+    private int total_frames;
     private String bgcolor;
 
     private HashMap<String, Attribute> attributes;
@@ -15,7 +15,7 @@ public class Composition {
         this.width = 500;
         this.height = 500;
         this.fps = 25;
-        this.durationSeconds = 60;
+        this.total_frames = 1500;
         this.bgcolor = "'#ffffff'";
     }
 
@@ -41,6 +41,7 @@ public class Composition {
         } else if (name.equals("fps")) {
             setFps(Integer.decode(attr.getValue()));
         } else if (name.equals("duration")) {
+            System.out.println("setando duração");
             setDuration(attr.getValue());
         } else if (name.equals("background")) {
             setBgcolor(attr.getValue());
@@ -64,17 +65,14 @@ public class Composition {
         this.fps = fps;
     }
 
-    public void setDuration(String duration) {
-//        this.durationSeconds ;
+    public void setDuration(String total_frames) {
+        this.total_frames = Integer.decode(total_frames);
     }
 
     public void setBgcolor(String bgcolor) {
         this.bgcolor = bgcolor;
     }
 
-    public void setDurationSeconds(int durationSeconds) {
-        this.durationSeconds = durationSeconds;
-    }
 
     public int getWidth() {
         return this.width;
@@ -85,7 +83,7 @@ public class Composition {
     }
 
     public int getTotalFrames() {
-        return this.durationSeconds * this.fps;
+        return this.total_frames;
     }
 
     public int getFPS() {

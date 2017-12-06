@@ -5,24 +5,39 @@
 @description "Descrição da animação"
 
 composition:
-    width = 600
-    height = 600
+    width = 500
+    height = 500
     fps = 25
     duration = 1m15s # 10f
     background = "#0ff"
 
 elements:
 
+    Moon
+    {
+        image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_moon.png"
+
+        action init(a, b) {
+            x = a
+            y = b
+
+            width = 12
+            height = 12
+        }
+    }
+
     Earth
     {
         image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_earth.png"
 
-#        Moon lua()
-        # Elementos também possuem ações, que podem alterar suas propriedades
+        Moon lua(20,20)
 
         action init(a,b){
             x = a
             y = b
+
+            width = 24
+            height = 24
         }
 
         action translada() {
@@ -35,7 +50,7 @@ elements:
         }
 
         action rotaciona() {
-            rotation += 0.05 #deg
+            rotation += 0.05
         }
 
 #        action escala() {
@@ -44,30 +59,17 @@ elements:
     }
 
 scene:
-    Earth terra(20,20)
-#    terra.x = 300
-#    terra.y = 300
+    Earth terra(200,200)
 
-    Earth terra2(100,100)
-#    terra2.x = 100
-#    terra2.y = 300
-
-#    Earth terra(100, 300)
+    Earth terra1(100,100)
 
 storyboard:
 [0f]:
     start terra.rotaciona()
-[30m30s]:
-    start terra2.translada()
+[10s]:
+    start terra1.rotaciona()
     terra.x = 10
     terra.y = 10
 [100f]:
     start terra.translada()
-
-[150f]:
-    start terra2.rotaciona()
-    stop terra.rotaciona()
-
-[200f]:
-    stop terra.translada()
 

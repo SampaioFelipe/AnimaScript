@@ -1,5 +1,7 @@
 package br.ufscar.dc.animaScript.animation;
 
+import java.util.ArrayList;
+
 public class Command {
 
     enum TYPE {
@@ -10,7 +12,11 @@ public class Command {
 
     private String identifier;
 
-    private String value_or_params;
+    private String value;
+
+    private String params;
+
+    private int numberParams;
 
     private String op;
 
@@ -19,20 +25,28 @@ public class Command {
         StringBuilder state = new StringBuilder();
 
         if (this.type == TYPE.attr) {
-            state.append(identifier + " " + op + " " + value_or_params);
+            state.append(identifier + " " + op + " " + value);
         } else {
-            state.append(op + " " + identifier + "("+ value_or_params +")");
+            state.append(op + " " + identifier + "("+ params +")");
         }
 
         return state.toString();
+    }
+
+    public Command(){
+        this.params = "";
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public String getValue_or_params() {
-        return value_or_params;
+    public String getValue() {
+        return this.value;
+    }
+
+    public String getParams(){
+        return this.params;
     }
 
     public String getOp() {
@@ -61,17 +75,36 @@ public class Command {
         return this.type == TYPE.action;
     }
 
-    public void buildAction(String op, String identifier, String params) {
+    public void buildAction(String op, String identifier, ArrayList<String> params) {
         this.type = TYPE.action;
         this.op = op;
         this.identifier = identifier;
-        this.value_or_params = params;
+
+        this.setParams(params);
+    }
+
+    public void setParams(ArrayList<String> params){
+        this.numberParams = params.size();
+
+        if(this.numberParams > 0){
+            this.params = params.get(0);
+
+            for(int i = 1; i < this.numberParams; i++){
+                this.params += "," + params.get(i);
+            }
+        }
+    }
+
+    public int getNumberParams() {
+        return numberParams;
     }
 
     public void buildAttribute(String identifier, String op, String value) {
         this.type = TYPE.attr;
         this.identifier = identifier;
         this.op = op;
-        this.value_or_params = value;
+        this.value = value;
     }
+
+
 }

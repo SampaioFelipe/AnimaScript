@@ -5,9 +5,10 @@ import java.util.ArrayList;
 public class Action {
     String name;
 
-    ArrayList<String> params;
-
     ArrayList<Command> commands;
+
+    int numberParams;
+    String params;
 
     @Override
     public String toString() {
@@ -23,19 +24,11 @@ public class Action {
         return state.toString();
     }
 
-    public Action(String name){
+    public Action(String name, ArrayList<String> params){
         this.name = name;
-        params = new ArrayList<String>();
-        commands = new ArrayList<Command>();
-    }
-
-    public boolean addParam(String param) {
-        if(!params.contains(param)) {
-            params.add(param);
-            return true;
-        }
-
-        return false;
+        this.setParams(params);
+        this.commands = new ArrayList<Command>();
+        this.setParams(params);
     }
 
     public void addCommand(Command command) {
@@ -48,5 +41,25 @@ public class Action {
 
     public ArrayList<Command> getCommands() {
         return commands;
+    }
+
+    public int getNumberParams() {
+        return numberParams;
+    }
+
+    public void setParams(ArrayList<String> params){
+        this.numberParams = params.size();
+
+        if(this.numberParams > 0){
+            this.params = params.get(0);
+
+            for(int i = 1; i < this.numberParams; i++){
+                this.params += "," + params.get(i);
+            }
+        }
+    }
+
+    public String getParams() {
+        return params;
     }
 }
