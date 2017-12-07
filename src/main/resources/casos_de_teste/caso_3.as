@@ -21,8 +21,8 @@ elements:
             x = a
             y = b
 
-            width = 12
-            height = 12
+            width = 7
+            height = 7
         }
     }
 
@@ -40,7 +40,7 @@ elements:
             height = 24
         }
 
-        action translada() {
+        action translada() { # Como colocar argumentos nos frames?
             x += 1
             y += 1
         }

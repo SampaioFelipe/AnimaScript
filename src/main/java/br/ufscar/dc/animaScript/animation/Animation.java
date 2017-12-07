@@ -205,8 +205,6 @@ public class Animation {
             frames += fps * valor;
         }
 
-        System.out.println(frames);
-
         return frames;
     }
 }

@@ -29,7 +29,9 @@ public class CodeGenerator {
                 "<head>" +
                 "<meta charset=\"utf-8\">");
 
-        html.append("<title>" + animation.getTitle() + "</title>");
+        String title = animation.getTitle();
+
+        html.append("<title>" + title.substring(1, title.length() - 1) + "</title>");
 
         html.append("<style media=\"screen\">" +
                 ".wrapper {" +
@@ -94,8 +96,8 @@ public class CodeGenerator {
                 "var fps = " + animation.getComposition().getFPS() + ";\n" +
                 "var frame_duration = 1000/fps;\n" +
                 "var loop = false;\n" + // TODO: tratar escolha de loop
-                "var elapsed_time = 0;\n" +
-                "var last_frame_update_time = 0;\n");
+                "var now;\n " +
+                "var then = Date.now();");
 
         // Controle do estado da animação
 
@@ -113,8 +115,6 @@ public class CodeGenerator {
                 "}\n" +
                 "function stop() {\n" +
                 "  current_frame = -1;\n" +
-                "  elapsed_time = 0;\n" +
-                "  last_frame_update_time = 0;\n" +
                 "  pause();\n" +
                 "  init();\n" +
                 "}\n" +
@@ -127,26 +127,6 @@ public class CodeGenerator {
                 "  \n" +
                 "  document.getElementById(\"current_time\").innerHTML = h + \":\" + m + \":\" + s;\n" +
                 "}\n");
-
-        // Controle da taxa de atualização do frame
-        codeBuffer.append("function update(timestamp) {\n" +
-                "  if (!paused || (current_frame < 0)) {\n" +
-                "      var dt = timestamp - last_frame_update_time;\n" +
-                "      if (loop || current_frame < total_frame - 1) {\n" +
-                "        elapsed_time += dt;\n" +
-                "        if (elapsed_time > frame_duration) {\n" +
-                "          current_frame += 1;\n" +
-                "          current_frame = current_frame % total_frame;\n" +
-                "          elapsed_time -= frame_duration;\n" +
-                "          change_frame = true;\n" +
-                "          return true;\n" +
-                "        } else {\n" +
-                "          change_frame = false;\n" +
-                "        }\n" +
-                "      }\n" +
-                "  }\n" +
-                "  return false;\n" +
-                "}");
     }
 
     private void decodedDeclElements() {
@@ -193,14 +173,13 @@ public class CodeGenerator {
     private void decodeScene() {
 
         for (Map.Entry<String, Element> inst : animation.getInst_element().entrySet()) {
-            codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "("+ inst.getValue().getInitParams()+");\n");
+            codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "(" + inst.getValue().getInitParams() + ");\n");
             codeBuffer.append(inst.getKey() + ".frames = {\n");
 
             for (Map.Entry<Integer, ArrayList<Command>> cmds : inst.getValue().getFrames().entrySet()) {
                 codeBuffer.append(cmds.getKey() + ": [");
                 String attributions = "";
                 for (Command cmd : cmds.getValue()) {
-                    //TODO: tratar quando o comando não for action
 
                     if (cmd.getOpId() == 2) {
                         attributions += "obj." + cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
@@ -224,21 +203,21 @@ public class CodeGenerator {
             codeBuffer.append("}\n");
         }
 
-        //TODO: ajeitar inicialização da animação
         codeBuffer.append("function init() {\n");
 
         for (Map.Entry<String, Element> elementEntry : animation.getInst_element().entrySet()) {
-            codeBuffer.append(elementEntry.getKey() + ".init(" + elementEntry.getValue().getInitParams()+");\n");
-//            for (Attribute attr : elementEntry.getValue().getAttributes().values()) {
-//                codeBuffer.append(elementEntry.getKey() + "." + attr.getName() + "=" + attr.getValue() + ";\n");
-//            }
+            codeBuffer.append(elementEntry.getKey() + ".init(" + elementEntry.getValue().getInitParams() + ");\n");
         }
 
         codeBuffer.append("window.requestAnimationFrame(draw);\n" +
                 "}");
 
-        codeBuffer.append("function draw(timestamp) {\n" +
-                "    if(update(timestamp)) {\n" +
+        codeBuffer.append("function draw() {\n" +
+                "    requestAnimationFrame(draw);\n" +
+                "    if (loop || current_frame < total_frame) {\n" +
+                "      now = Date.now();\n" +
+                "      delta = now - then;\n" +
+                "      if((!paused && (delta > frame_duration)) || current_frame < 1) {" +
                 "    show_time();\n" +
                 "    ctx.clearRect(0, 0," + animation.getComposition().getWidth() + ", " + animation.getComposition().getHeight() + ");\n");
 
@@ -246,12 +225,13 @@ public class CodeGenerator {
             codeBuffer.append(obj + ".draw(ctx);\n");
         }
 
-        codeBuffer.append("}\n" +
+        codeBuffer.append(
                 "ctx.fillRect(0,0," + animation.getComposition().getWidth() + ", " + animation.getComposition().getHeight() + ");" +
-                "last_frame_update_time = timestamp;\n" +
-                "    if(!paused) {\n" +
-                "      window.requestAnimationFrame(draw);\n" +
-                "    }\n" +
+                "then = now - (delta % frame_duration);\n" +
+                "current_frame += 1;\n" +
+                "current_frame = current_frame % total_frame;\n" +
+                "}\n" +
+                "}" +
                 "}\n" +
                 "init();");
     }
@@ -278,11 +258,11 @@ public class CodeGenerator {
 
         codeBuffer.append("}\n");
 
-
-//        codeBuffer.append("this.init("+element.getInitParams()+");" +
-//                "}\n");
-
+        // Funcao init
         codeBuffer.append("init(" + element.getInitParams() + "){\n");
+
+        codeBuffer.append("this.x = 0; this.y = 0; this.width = " + image + ".naturalWidth;" +
+                "this.height = " + image + ".naturalHeight; this.rotation = 0;");
 
         for (Command child : element.getChildren().values()) {
 
@@ -320,7 +300,7 @@ public class CodeGenerator {
             codeBuffer.append("ctx.restore();\n");
         }
 
-        codeBuffer.append("ctx.drawImage(" + image + ", -this.width/2, -this.height/2);\n" + //TODO: ajustar posicao de desenho no meio
+        codeBuffer.append("ctx.drawImage(" + image + ", -this.width/2, -this.height/2, this.width, this.height);\n" + //TODO: ajustar posicao de desenho no meio
                 "    ctx.restore();\n" +
                 "  }\n");
 
@@ -335,7 +315,13 @@ public class CodeGenerator {
 
     private void decodeDeclAction(Action action) {
 
-        codeBuffer.append(action.getName() + "(obj){\n"); // TODO: tratar os parametros
+        codeBuffer.append(action.getName() + "(obj"); // TODO: tratar os parametros
+
+        if (action.getParams().length() > 0) {
+            codeBuffer.append("," + action.getParams());
+        }
+
+        codeBuffer.append("){\n");
 
         for (Command cmd : action.getCommands()) {
             decodeCommand(cmd, "obj");

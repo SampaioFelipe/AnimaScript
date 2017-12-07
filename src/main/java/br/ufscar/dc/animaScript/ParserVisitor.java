@@ -84,8 +84,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         Action action = new Action(ctx.name.getText(), params);
 
-        System.out.println(action.getParams());
-
         for (AnimaScriptParser.CommandContext cmd : ctx.command()) {
             action.addCommand((Command) visitCommand(cmd));
         }
@@ -104,8 +102,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         for (AnimaScriptParser.Decl_actionContext decl_action : ctx.decl_action()) {
             Action action = (Action) visitDecl_action(decl_action);
-            System.out.println("-----------");
-            System.out.println(action.getParams());
 
             element.addAction(action);
         }
@@ -126,8 +122,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         for (AnimaScriptParser.Element_instanceContext instanceContext : ctx.element_instance()) {
             Command element = (Command) visitElement_instance(instanceContext);
             if (element != null) {
-                System.out.println("ahhhhhhhhhhhhhhhhhhhh");
-                System.out.println(element.getParams());
 
                 animation.addInstElement(element.getOp(),
                         element, instanceContext.start.getLine());

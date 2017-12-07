@@ -33,13 +33,6 @@ public class Element {
         frames = new HashMap<Integer, ArrayList<Command>>();
 
         attributes = new HashMap<String, Attribute>();
-        // Definição dos atributos padrões
-        attributes.put("x", new Attribute("x", "0"));
-        attributes.put("y", new Attribute("y", "0"));
-        attributes.put("rotation", new Attribute("rotation", "0"));
-
-        attributes.put("width", new Attribute("width", "200")); // TODO: qual valor default?
-        attributes.put("height", new Attribute("height", "200")); // TODO: qual valor default?
 
         this.numberParamsConstructor = 0;
         this.initParams = "";

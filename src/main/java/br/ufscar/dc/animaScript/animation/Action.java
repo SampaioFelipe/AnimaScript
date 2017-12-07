@@ -56,6 +56,8 @@ public class Action {
             for(int i = 1; i < this.numberParams; i++){
                 this.params += "," + params.get(i);
             }
+        } else {
+            this.params = "";
         }
     }
 
