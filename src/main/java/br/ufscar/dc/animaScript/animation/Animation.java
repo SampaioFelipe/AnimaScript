@@ -112,12 +112,11 @@ public class Animation {
             if (this.inst_element.containsKey(identifiers[0])) {
                 Element obj = this.inst_element.get(identifiers[0]);
 
-                if((obj.getActions().containsKey(identifiers[1]) || obj.getAttributes().containsKey(identifiers[1]) || obj.getChildren().containsKey(identifiers[1]))){
+                if((obj.getActions().containsKey(identifiers[1]) || obj.getAttributes().containsKey(identifiers[1]) || obj.getChildren().containsKey(identifiers[1]))
+                        || (identifiers[1].equals("x") || identifiers[1].equals("y"))){
                     cmd.setIdentifier(identifiers[1]);
                 } else {
-                    if(!identifiers[1].equals("x") && !identifiers[1].equals("y")) {
-                        Main.out.printErro(line, identifiers[1] + " não declarado");
-                    }
+                    Main.out.printErro(line, identifiers[1] + " não declarado");
                 }
 
                  // TODO: tratar aninhamento
