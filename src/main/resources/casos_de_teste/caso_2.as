@@ -59,6 +59,7 @@ storyboard:
     start terra.rotaciona()
 [30m30s]:
     start terra2.translada()
+    start terra2.teste()
     terra.x = 10
     terra.y = 10
 [100f]:

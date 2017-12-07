@@ -9,6 +9,9 @@ import br.ufscar.dc.animaScript.animation.Command;
 import br.ufscar.dc.animaScript.animation.Element;
 import org.antlr.v4.runtime.Token;
 
+import br.ufscar.dc.animaScript.AnimaScriptBaseVisitor;
+import br.ufscar.dc.animaScript.AnimaScriptParser;
+
 public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     private Animation animation;
@@ -166,6 +169,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         if (ctx.decl_attr() != null) {
 
             Command cmd = new Command();
+
 
             if (ctx.decl_attr().OP_ATTRIB() != null) {
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),

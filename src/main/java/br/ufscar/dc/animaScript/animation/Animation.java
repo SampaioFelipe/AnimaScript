@@ -111,7 +111,16 @@ public class Animation {
             String[] identifiers = cmd.getIdentifier().split("\\.");
             if (this.inst_element.containsKey(identifiers[0])) {
                 Element obj = this.inst_element.get(identifiers[0]);
-                cmd.setIdentifier(identifiers[1]); // TODO: tratar aninhamento
+
+                if((obj.getActions().containsKey(identifiers[1]) || obj.getAttributes().containsKey(identifiers[1]) || obj.getChildren().containsKey(identifiers[1]))){
+                    cmd.setIdentifier(identifiers[1]);
+                } else {
+                    if(!identifiers[1].equals("x") && !identifiers[1].equals("y")) {
+                        Main.out.printErro(line, identifiers[1] + " não declarado");
+                    }
+                }
+
+                 // TODO: tratar aninhamento
                 obj.addFrame(Integer.decode(frame), cmd);
             } else {
                 Main.out.printErro(line, identifiers[0] + "nao declarado");
