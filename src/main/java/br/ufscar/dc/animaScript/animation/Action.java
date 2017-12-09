@@ -1,14 +1,14 @@
 package br.ufscar.dc.animaScript.animation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Action {
     String name;
 
     ArrayList<Command> commands;
 
-    int numberParams;
-    String params;
+    List<String> params;
 
     @Override
     public String toString() {
@@ -44,24 +44,28 @@ public class Action {
     }
 
     public int getNumberParams() {
-        return numberParams;
+        return this.params.size();
     }
 
-    public void setParams(ArrayList<String> params){
-        this.numberParams = params.size();
-
-        if(this.numberParams > 0){
-            this.params = params.get(0);
-
-            for(int i = 1; i < this.numberParams; i++){
-                this.params += "," + params.get(i);
-            }
-        } else {
-            this.params = "";
-        }
+    public void setParams(List<String> params){
+        this.params = params;
     }
 
-    public String getParams() {
+    public List<String> getParams() {
         return params;
+    }
+
+    public String decodeParams(){
+
+        String paramsString = "";
+        if(this.params.size() > 0){
+            paramsString = this.params.get(0);
+
+            for(int i = 1; i < this.params.size(); i++){
+                paramsString += "," + params.get(i);
+            }
+        }
+
+        return paramsString;
     }
 }

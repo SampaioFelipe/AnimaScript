@@ -1,6 +1,7 @@
 package br.ufscar.dc.animaScript;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import br.ufscar.dc.animaScript.animation.Action;
 import br.ufscar.dc.animaScript.animation.Animation;
@@ -9,15 +10,17 @@ import br.ufscar.dc.animaScript.animation.Command;
 import br.ufscar.dc.animaScript.animation.Element;
 import org.antlr.v4.runtime.Token;
 
-import br.ufscar.dc.animaScript.AnimaScriptBaseVisitor;
-import br.ufscar.dc.animaScript.AnimaScriptParser;
-
 public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     private Animation animation;
+    private Element cur_element;
+
+    private List<String> local_variables;
 
     public ParserVisitor(Animation animation) {
         super();
+
+        local_variables = new ArrayList<String>();
 
         this.animation = animation;
     }
@@ -29,7 +32,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
             for (int i = 0; i < ctx.GLOBAL_ATTR().size(); i++) {
                 Attribute attr = new Attribute(ctx.GLOBAL_ATTR().get(i).getText(), ctx.value().get(i).getText());
-
                 animation.addGlobalAttr(attr);
             }
         }
@@ -60,10 +62,16 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitDecl_attr(AnimaScriptParser.Decl_attrContext ctx) {
+        String attr = ctx.attr().getText();
+        String value = (String) visitValue(ctx.value());
 
-        //TODO: temos que ver o tipo de atribuicao, o que fazer com ela?
+        return new Attribute(attr, value);
+    }
 
-        return new Attribute(ctx.attr().getText(), ctx.value().getText());
+    @Override
+    public Object visitValue(AnimaScriptParser.ValueContext ctx) {
+        super.visitValue(ctx);
+        return ctx.getText();
     }
 
     @Override
@@ -87,24 +95,86 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         Action action = new Action(ctx.name.getText(), params);
 
+        local_variables.addAll(action.getParams());
+
         for (AnimaScriptParser.CommandContext cmd : ctx.command()) {
             action.addCommand((Command) visitCommand(cmd));
         }
 
+        local_variables.removeAll(action.getParams());
+
         return action;
+    }
+
+    @Override
+    public Object visitExpr(AnimaScriptParser.ExprContext ctx) {
+        if (ctx.attr() != null) {
+
+            List<String> idents = new ArrayList<String>();
+
+            for (Token ident : ctx.attr().idents) {
+                idents.add(ident.getText());
+            }
+
+            if(!local_variables.contains(idents.get(0))){
+
+                Element element_aux;
+
+                if (idents.get(0).equals("this")) {
+                    if (cur_element == null) {
+                        Main.out.printErro(ctx.start.getLine(), "'this' nao permitido neste escopo");
+                        return ctx.getText();
+                    }
+
+                    element_aux = cur_element;
+
+                } else {
+                    if (animation.getInst_element().containsKey(idents.get(0))) {
+                        element_aux = animation.getInst_element().get(idents.get(0));
+                    } else {
+                        Main.out.printErro(ctx.start.getLine(), idents.get(0) + " nao declarado");
+                        return ctx.getText();
+                    }
+                }
+
+                if(!element_aux.verifyAttr(idents.subList(1, idents.size()))){
+                    Main.out.printErro(ctx.start.getLine(), " expressao invalida ");
+                }
+            }
+        }
+
+        return super.visitExpr(ctx);
     }
 
     @Override
     public Object visitDecl_element(AnimaScriptParser.Decl_elementContext ctx) {
         Element element = new Element(ctx.IDENT_DECL_ELEMENT().getText());
 
+        cur_element = element;
+
         for (AnimaScriptParser.Decl_attrContext decl_attr : ctx.decl_attr()) {
             Attribute attribute = (Attribute) visitDecl_attr(decl_attr);
             element.addAttribute(attribute);
         }
 
+        if (element.getImage_path() == null) {
+            Main.out.printErro(ctx.IDENT_DECL_ELEMENT().getSymbol().getLine(),
+                    element.getName() + " nao possui o atributo \'image\'");
+        }
+
         for (AnimaScriptParser.Decl_actionContext decl_action : ctx.decl_action()) {
             Action action = (Action) visitDecl_action(decl_action);
+
+            if(action.getName().equals("init")) {
+                for(Command cmd : action.getCommands()){
+                    String[] ident = cmd.getIdentifier().split("\\.");
+                    if(ident[0].equals("this")){
+                        System.out.println(ident[1]);
+                        element.getAttributes().remove(ident[1]);
+                        System.out.println(element.getAttributes());
+                    }
+                }
+            }
 
             element.addAction(action);
         }
@@ -115,6 +185,8 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         }
 
         animation.addDeclElement(element);
+
+        cur_element = null;
 
         return null;
     }
@@ -172,15 +244,15 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
 
             if (ctx.decl_attr().OP_ATTRIB() != null) {
+                visitDecl_attr(ctx.decl_attr());
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),
                         ctx.decl_attr().OP_ATTRIB().getText(),
-                        ctx.decl_attr().value().getText()); // TODO: verificar tipo da operação
+                        ctx.decl_attr().value().getText());
             } else {
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),
                         ctx.decl_attr().OP_ATTRIB2().getText(),
-                        ctx.decl_attr().value().getText()); // TODO: verificar tipo da operação
+                        ctx.decl_attr().value().getText());
             }
-
             return cmd;
         } else {
 

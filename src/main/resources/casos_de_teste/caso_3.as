@@ -18,13 +18,13 @@ elements:
         image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_moon.png"
 
         action init(a, b) {
-            x = a
-            y = b
+            this.x = a
+            this.y = b
 
-            k = 0
+#            k = 0
 
-            width = 7
-            height = 7
+            this.width = 7
+            this.height = 7
         }
     }
 
@@ -35,8 +35,8 @@ elements:
         Moon lua(20,20)
 
         action init(a,b){
-            x = a
-            y = b
+            this.x = a
+            this.y = b
 
 #            width = 100
 #            height = 100
@@ -72,10 +72,13 @@ storyboard:
 [10s]:
     start terra1.rotaciona()
     terra.x = 10
-    terra.y = 10
+#    terra.a.y = 10
 
 [20s]:
     start terra.escala()
 
 [100f]:
     start terra.translada(5,5)
+
+
+#List<String> attrs = Arrays.asList(left.split("."));

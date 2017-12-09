@@ -59,7 +59,7 @@ time
     | HOUR_FORMAT;
 
 expr
-    : (NUM_INT | NUM_REAL | IDENT) (OP_MATH expr)?
+    : (NUM_INT | NUM_REAL | attr) (OP_MATH expr)?
     | ('(' expr')');
 
 composition
@@ -72,7 +72,7 @@ decl_attr_comp
     : attr OP_ATTRIB value;
 
 attr:
-    IDENT ('.' IDENT)*;
+    idents+=IDENT ('.' idents+=IDENT)*;
 
 elements:
     'elements' ':' (decls+=decl_element)+;

@@ -1,6 +1,7 @@
 package br.ufscar.dc.animaScript.animation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Command {
 
@@ -14,9 +15,7 @@ public class Command {
 
     private String value;
 
-    private String params;
-
-    private int numberParams;
+    private List<String> params;
 
     private String op;
 
@@ -34,7 +33,7 @@ public class Command {
     }
 
     public Command(){
-        this.params = "";
+        this.params = new ArrayList<String>();
     }
 
     public String getIdentifier() {
@@ -45,8 +44,21 @@ public class Command {
         return this.value;
     }
 
-    public String getParams(){
+    public List<String> getParams(){
         return this.params;
+    }
+
+    public String decodeParams(){
+
+        String paramsString = "";
+        if(this.params.size() > 0){
+            paramsString = this.params.get(0);
+
+            for(int i = 1; i < this.params.size(); i++){
+                paramsString += "," + params.get(i);
+            }
+        }
+        return paramsString;
     }
 
     public String getOp() {
@@ -84,19 +96,11 @@ public class Command {
     }
 
     public void setParams(ArrayList<String> params){
-        this.numberParams = params.size();
-
-        if(this.numberParams > 0){
-            this.params = params.get(0);
-
-            for(int i = 1; i < this.numberParams; i++){
-                this.params += "," + params.get(i);
-            }
-        }
+        this.params = params;
     }
 
     public int getNumberParams() {
-        return numberParams;
+        return this.params.size();
     }
 
     public void buildAttribute(String identifier, String op, String value) {

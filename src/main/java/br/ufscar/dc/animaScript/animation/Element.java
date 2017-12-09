@@ -2,8 +2,12 @@ package br.ufscar.dc.animaScript.animation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Element {
+
+    public static HashMap<String, Element> decl_elements;
+
     private String name;
     private String image_path;
     private HashMap<Integer, ArrayList<Command>> frames;
@@ -14,9 +18,7 @@ public class Element {
 
     private HashMap<String, Action> actions;
 
-    private int numberParamsConstructor;
-
-    private String initParams;
+    private List<String> initParams;
 
     @Override
     public String toString() {
@@ -34,21 +36,25 @@ public class Element {
 
         attributes = new HashMap<String, Attribute>();
 
-        this.numberParamsConstructor = 0;
-        this.initParams = "";
+        attributes.put("x", new Attribute("x", "0"));
+        attributes.put("y", new Attribute("y", "0"));
+        attributes.put("width", new Attribute("width", "0"));
+        attributes.put("height", new Attribute("height", "0"));
+        attributes.put("rotation", new Attribute("rotation", "0"));
+
+        this.initParams = new ArrayList<String>();
     }
 
     public Element(Element old) {
         this.name = old.name;
 
-        attributes = new HashMap<String, Attribute>();
+//        attributes = new HashMap<String, Attribute>();
         // Definição dos atributos padrões
         attributes = (HashMap<String, Attribute>) old.attributes.clone();
         children = (HashMap<String, Command>) old.children.clone();
 
         actions = old.actions;
         frames = new HashMap<Integer, ArrayList<Command>>();
-        this.numberParamsConstructor = old.numberParamsConstructor;
         this.initParams = old.initParams;
     }
 
@@ -78,26 +84,37 @@ public class Element {
         return false;
     }
 
-    public boolean setInitParams(ArrayList<String> params) {
-        if (params.size() == this.numberParamsConstructor) {
-            this.initParams = params.get(0);
-
-            for (int i = 1; i < params.size(); i++) {
-                this.initParams += "," + params.get(i);
-            }
-
+    public boolean verifyAttr(List<String> attrs){
+        String first = attrs.get(0);
+        if(attributes.containsKey(first)){
             return true;
+        }
+        else if(children.containsKey(first)){
+            return decl_elements.get(first).verifyAttr(attrs.subList(1, attrs.size()));
         }
 
         return false;
     }
 
-    public void setInitParams(String params) {
+    public void setInitParams(List<String> params) {
         this.initParams = params;
     }
 
-    public String getInitParams() {
+    public List<String> getInitParams() {
         return initParams;
+    }
+
+    public String decodeInitParams(){
+        String paramsString = "";
+        if(this.initParams.size() > 0){
+            paramsString = this.initParams.get(0);
+
+            for(int i = 1; i < this.initParams.size(); i++){
+                paramsString += "," + initParams.get(i);
+            }
+        }
+
+        return paramsString;
     }
 
     public boolean addChild(Command child) {
@@ -115,7 +132,6 @@ public class Element {
         if (!this.getActions().containsKey(action.getName())) {
 
             if (action.getName().equals("init")) {
-                this.numberParamsConstructor = action.getNumberParams();
                 this.initParams = action.getParams();
             }
 
@@ -179,6 +195,6 @@ public class Element {
     }
 
     public int getNumberParamsConstructor() {
-        return numberParamsConstructor;
+        return initParams.size();
     }
 }

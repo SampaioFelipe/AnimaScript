@@ -11,14 +11,14 @@ public class Animation {
     private Composition composition;
     private HashMap<String, Attribute> globals;
 
-    private HashMap<String, Element> decl_elements;
     private HashMap<String, Element> inst_element;
 
     public Animation() {
+
         this.globals = new HashMap<String, Attribute>();
         this.composition = new Composition();
 
-        this.decl_elements = new HashMap<String, Element>();
+        Element.decl_elements = new HashMap<String, Element>();
         this.inst_element = new HashMap<String, Element>();
     }
 
@@ -35,7 +35,7 @@ public class Animation {
 
         state.append("\n\nElements:\n");
 
-        for (Map.Entry<String, Element> element : this.decl_elements.entrySet()) {
+        for (Map.Entry<String, Element> element : Element.decl_elements.entrySet()) {
             state.append(element.getValue().toString() + "\n");
         }
 
@@ -78,8 +78,8 @@ public class Animation {
     }
 
     public boolean addDeclElement(Element element) {
-        if (!this.decl_elements.containsKey(element.getName())) {
-            this.decl_elements.put(element.getName(), element);
+        if (!Element.decl_elements.containsKey(element.getName())) {
+            Element.decl_elements.put(element.getName(), element);
             return true;
         }
 
@@ -87,9 +87,9 @@ public class Animation {
     }
 
     public boolean addInstElement(String elementType, Command element, int line) {
-        if (this.decl_elements.containsKey(elementType)) {
+        if (Element.decl_elements.containsKey(elementType)) {
 
-            Element newInstance = new Element(this.decl_elements.get(elementType));
+            Element newInstance = new Element(Element.decl_elements.get(elementType));
 
             if (newInstance.getNumberParamsConstructor() == element.getNumberParams()) {
 
@@ -100,7 +100,7 @@ public class Animation {
                 Main.out.printErro(line, "numero de parametros incompativel com o tipo de elemento");
             }
         } else {
-            Main.out.printErro(line, "tipo \"" + elementType + "\" nao declarado");
+            Main.out.printErro(line, "tipo '" + elementType + "' nao declarado");
         }
         return false;
     }
@@ -111,18 +111,18 @@ public class Animation {
             String[] identifiers = cmd.getIdentifier().split("\\.");
             if (this.inst_element.containsKey(identifiers[0])) {
                 Element obj = this.inst_element.get(identifiers[0]);
-
-                if((obj.getActions().containsKey(identifiers[1]) || obj.getAttributes().containsKey(identifiers[1]) || obj.getChildren().containsKey(identifiers[1]))
-                        || (identifiers[1].equals("x") || identifiers[1].equals("y"))){
-                    cmd.setIdentifier(identifiers[1]);
-                } else {
-                    Main.out.printErro(line, identifiers[1] + " não declarado");
-                }
+//
+//                if((obj.getActions().containsKey(identifiers[1]) || obj.getAttributes().containsKey(identifiers[1]) || obj.getChildren().containsKey(identifiers[1]))
+//                        || (identifiers[1].equals("x") || identifiers[1].equals("y"))){
+//                    cmd.setIdentifier(identifiers[1]);
+//                } else {
+//                    Main.out.printErro(line, identifiers[1] + " não declarado");
+//                }
 
                  // TODO: tratar aninhamento
                 obj.addFrame(Integer.decode(frame), cmd);
             } else {
-                Main.out.printErro(line, identifiers[0] + "nao declarado");
+//                Main.out.printErro(line, identifiers[0] + " nao declarado");
                 return false;
             }
         }
@@ -149,7 +149,7 @@ public class Animation {
     }
 
     public HashMap<String, Element> getDecl_elements() {
-        return decl_elements;
+        return Element.decl_elements;
     }
 
     public HashMap<String, Element> getInst_element() {
@@ -157,8 +157,8 @@ public class Animation {
     }
 
     public boolean addElement(Element element) {
-        if (!this.decl_elements.containsKey(element.getName())) {
-            this.decl_elements.put(element.getName(), element);
+        if (!Element.decl_elements.containsKey(element.getName())) {
+            Element.decl_elements.put(element.getName(), element);
             return true;
         }
 

@@ -174,7 +174,7 @@ public class CodeGenerator {
 
         for (Map.Entry<String, Element> inst : animation.getInst_element().entrySet()) {
 
-            codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "(" + inst.getValue().getInitParams() + ");\n");
+            codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "(" + inst.getValue().decodeInitParams() + ");\n");
             codeBuffer.append(inst.getKey() + ".frames = {\n");
 
             for (Map.Entry<Integer, ArrayList<Command>> cmds : inst.getValue().getFrames().entrySet()) {
@@ -183,12 +183,12 @@ public class CodeGenerator {
                 for (Command cmd : cmds.getValue()) {
 
                     if (cmd.getOpId() == 2) {
-                        attributions += inst.getKey() + "." + cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
+                        attributions += cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
                     } else {
                         codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", " +
-                                "func: function(){" + inst.getKey() + "." + cmd.getIdentifier() +"("+inst.getKey());
+                                "func: function(){" + cmd.getIdentifier() +"("+inst.getKey());
                         if (cmd.getNumberParams() > 0) {
-                            codeBuffer.append(","+cmd.getParams());
+                            codeBuffer.append(","+cmd.decodeParams());
                         }
                         codeBuffer.append(");}},");
                     }
@@ -210,7 +210,7 @@ public class CodeGenerator {
         codeBuffer.append("function init() {\n");
 
         for (Map.Entry<String, Element> elementEntry : animation.getInst_element().entrySet()) {
-            codeBuffer.append(elementEntry.getKey() + ".init(" + elementEntry.getValue().getInitParams() + ");\n");
+            codeBuffer.append(elementEntry.getKey() + ".init(" + elementEntry.getValue().decodeInitParams() + ");\n");
         }
 
         codeBuffer.append("window.requestAnimationFrame(draw);\n" +
@@ -267,18 +267,22 @@ public class CodeGenerator {
         codeBuffer.append("}\n");
 
         // Funcao init
-        codeBuffer.append("init(" + element.getInitParams() + "){\n");
+        codeBuffer.append("init(" + element.decodeInitParams() + "){\n");
 
-        codeBuffer.append("this.x = 0; this.y = 0; this.width = " + image + ".naturalWidth;" +
-                "this.height = " + image + ".naturalHeight; this.rotation = 0;");
+        for(Map.Entry<String, Attribute> attr : element.getAttributes().entrySet()){
+            codeBuffer.append("this."+attr.getKey() + "=");
+            if(attr.getKey().equals("width")){
+                codeBuffer.append(image + ".naturalWidth;");
+            } else if(attr.getKey().equals("height")) {
+                codeBuffer.append(image + ".naturalHeight;");
+            } else {
+                codeBuffer.append(attr.getValue().getValue() + ";");
+            }
+        }
 
         for (Command child : element.getChildren().values()) {
 
-            codeBuffer.append("this." + child.getIdentifier() + ".init(" + child.getParams() + ");\n");
-        }
-
-        for (Attribute attr : element.getAttributes().values()) {
-            codeBuffer.append("this." + attr.getName() + "=" + attr.getValue() + ";\n");
+            codeBuffer.append("this." + child.getIdentifier() + ".init(" + child.decodeParams() + ");\n");
         }
 
         Action initAction = element.getActions().remove("init");
@@ -286,7 +290,7 @@ public class CodeGenerator {
         if (initAction != null) {
 
             for (Command command : initAction.getCommands()) {
-                decodeCommand(command, "this");
+                decodeCommand(command,"");
             }
         }
 
@@ -325,8 +329,8 @@ public class CodeGenerator {
 
         codeBuffer.append(action.getName() + "(obj"); // TODO: tratar os parametros
 
-        if (action.getParams().length() > 0) {
-            codeBuffer.append("," + action.getParams());
+        if (action.getNumberParams() > 0) {
+            codeBuffer.append("," + action.decodeParams());
         }
 
         codeBuffer.append("){\n");

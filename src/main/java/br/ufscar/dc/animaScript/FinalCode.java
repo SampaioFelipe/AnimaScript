@@ -31,9 +31,9 @@ public class FinalCode {
         return inputName;
     }
 
-    public String getOutputFolderName() {
-        return outputFolderName;
-    }
+//    public String getOutputFolderName() {
+//        return outputFolderName;
+//    }
 
     public StringBuffer getOutputHtml() {
         return outputHtml;
