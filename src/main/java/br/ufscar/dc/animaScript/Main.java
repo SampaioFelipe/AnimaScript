@@ -29,8 +29,7 @@ public class Main {
                 CommonTokenStream tokens = new CommonTokenStream(lexer);
                 AnimaScriptParser parser = new AnimaScriptParser(tokens);
 
-//                parser.removeErrorListeners();
-                // Adiciona estrutra para a manipulação de erros sintaticos
+                // Adiciona estrutura para a manipulação de erros sintaticos
                 parser.addErrorListener(new ErrorParserListener(out));
 
                 // Realizacao da analise e geracao da arvore sintatica

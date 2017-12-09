@@ -49,20 +49,17 @@ decl_global
     : (GLOBAL_ATTR value)*;
 
 value
-    : STRING | time | num_value | position;
+    : STRING | time | expr;
 
 num_value
     : (expr | IDENT);
-
-position
-    : '(' num_value ',' num_value ')';
 
 time
     : NUM_INT 'f'
     | HOUR_FORMAT;
 
 expr
-    : ((NUM_INT | NUM_REAL) (OP_MATH (NUM_INT | NUM_REAL))*)(OP_MATH expr)*
+    : (NUM_INT | NUM_REAL | IDENT) (OP_MATH expr)?
     | ('(' expr')');
 
 composition

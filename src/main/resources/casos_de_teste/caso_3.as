@@ -21,6 +21,8 @@ elements:
             x = a
             y = b
 
+            k = 0
+
             width = 7
             height = 7
         }
@@ -36,13 +38,13 @@ elements:
             x = a
             y = b
 
-            width = 24
-            height = 24
+#            width = 100
+#            height = 100
         }
 
-        action translada() { # Como colocar argumentos nos frames?
-            x += 1
-            y += 1
+        action translada(a,b) { # Como colocar argumentos nos frames?
+            x += a
+            y += b
         }
 
         action deg_to_rad() {
@@ -53,9 +55,10 @@ elements:
             rotation += 0.05
         }
 
-#        action escala() {
-#            scale = 0.5
-#        }
+        action escala() {
+            width += 6
+            height += 6
+        }
     }
 
 scene:
@@ -70,6 +73,9 @@ storyboard:
     start terra1.rotaciona()
     terra.x = 10
     terra.y = 10
-[100f]:
-    start terra.translada()
 
+[20s]:
+    start terra.escala()
+
+[100f]:
+    start terra.translada(5,5)

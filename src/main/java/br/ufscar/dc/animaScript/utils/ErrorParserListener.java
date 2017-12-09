@@ -7,7 +7,6 @@ import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
@@ -20,15 +19,7 @@ public class ErrorParserListener implements ANTLRErrorListener {
     }
 
     public void syntaxError(Recognizer<?, ?> recognizer, Object o, int i, int i1, String s, RecognitionException e) {
-        if (!saida.isChanged()) {
-            Token error_token = (Token) o;
-            try {
-                // TODO: Falar com o professor sobre as mensagens de erro
-                saida.printErro(i, "erro sintatico proximo a " + error_token.getText().replace("<EOF>", "EOF"));
-            } catch (NullPointerException exception) {
-                exception.printStackTrace();
-            }
-        }
+        saida.sintaxErro();
     }
 
     public void reportAmbiguity(Parser parser, DFA dfa, int i, int i1, boolean b, BitSet bitSet, ATNConfigSet atnConfigSet) {

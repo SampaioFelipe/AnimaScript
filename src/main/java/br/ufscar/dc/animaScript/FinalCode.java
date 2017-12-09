@@ -64,6 +64,10 @@ public class FinalCode {
         return changed;
     }
 
+    public void sintaxErro(){
+        this.changed = true;
+    }
+
     public void printHtml(String codigo) {
         outputHtml.append(codigo);
         outputHtml.append("\n");

@@ -155,12 +155,12 @@ public class CodeGenerator {
                 "            }\n" +
                 "          }\n" +
                 "        } else {\n" +
-                "          cur[i].func(obj);\n" +
+                "          cur[i].func();\n" +
                 "        }\n" +
                 "      }\n" +
                 "    }\n" +
                 "    for (var i = 0; i < obj.cur_actions.length; i++) {\n" +
-                "      obj.cur_actions[i].func(this);\n" +
+                "      obj.cur_actions[i].func();\n" +
                 "    }\n" +
                 "  }" +
                 "}");
@@ -173,6 +173,7 @@ public class CodeGenerator {
     private void decodeScene() {
 
         for (Map.Entry<String, Element> inst : animation.getInst_element().entrySet()) {
+
             codeBuffer.append("var " + inst.getKey() + " = new " + inst.getValue().getName() + "(" + inst.getValue().getInitParams() + ");\n");
             codeBuffer.append(inst.getKey() + ".frames = {\n");
 
@@ -182,16 +183,19 @@ public class CodeGenerator {
                 for (Command cmd : cmds.getValue()) {
 
                     if (cmd.getOpId() == 2) {
-                        attributions += "obj." + cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
+                        attributions += inst.getKey() + "." + cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
                     } else {
                         codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", " +
-                                "func:" + inst.getKey() + "." + cmd.getIdentifier() + "}");
-                        codeBuffer.append(",");
+                                "func: function(){" + inst.getKey() + "." + cmd.getIdentifier() +"("+inst.getKey());
+                        if (cmd.getNumberParams() > 0) {
+                            codeBuffer.append(","+cmd.getParams());
+                        }
+                        codeBuffer.append(");}},");
                     }
                 }
 
                 if (attributions.length() > 0) {
-                    codeBuffer.append("{op:2, func: function(obj){");
+                    codeBuffer.append("{op:2, func: function(){");
 
                     codeBuffer.append(attributions);
 
@@ -242,6 +246,10 @@ public class CodeGenerator {
 
         codeBuffer.append("var " + image + " = new Image();\n");
         codeBuffer.append(image + ".src = " + element.getImage_path() + ";\n"); //TODO: devemos tratar a ordem
+        codeBuffer.append(image + ".onload = function()\n" +
+                "{\n" +
+                "    init()\n" +
+                "}\n");
 
         // Declaracao da class do elemento
         codeBuffer.append("class " + element.getName() + " extends Element {\n");
