@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import br.ufscar.dc.animaScript.Main;
+
 public class Element {
 
     public static HashMap<String, Element> decl_elements;
@@ -82,17 +84,46 @@ public class Element {
         return true;
     }
 
-    public boolean verifyAttr(List<String> attrs){
-        if(attrs.size() == 0)
+    public boolean verifyAttr(List<String> attrs) {
+        if (attrs.size() == 0)
             return false;
 
         String first = attrs.get(0);
 
-        if(decl_attributes.contains(first)){
+        if (decl_attributes.contains(first)) {
+            if (attrs.size() > 1)
+                return false;
+
             return true;
-        }
-        else if(children.containsKey(first)){
+        } else if (children.containsKey(first)) {
             return decl_elements.get(children.get(first).getOp()).verifyAttr(attrs.subList(1, attrs.size()));
+        }
+
+        return false;
+    }
+
+    public boolean verifyAction(List<String> attrs, int n_params, int linha) {
+        if (attrs.size() == 0) {
+            Main.out.printErro(linha, "chamada de funcao inconsistente");
+            return false;
+        }
+
+        String first = attrs.get(0);
+
+        if (actions.containsKey(first)) {
+            if (attrs.size() > 1) {
+                Main.out.printErro(linha, first + " nao possui actions");
+                return false;
+            }
+
+            if (actions.get(first).getNumberParams() != n_params) {
+                Main.out.printErro(linha, "numero de parametros incompativel");
+                return false;
+            }
+
+            return true;
+        } else if (children.containsKey(first)) {
+            return decl_elements.get(children.get(first).getOp()).verifyAction(attrs.subList(1, attrs.size()), n_params, linha);
         }
 
         return false;
@@ -102,12 +133,12 @@ public class Element {
         this.initParams = params;
     }
 
-    public String decodeInitParams(){
+    public String decodeInitParams() {
         String paramsString = "";
-        if(this.initParams.size() > 0){
+        if (this.initParams.size() > 0) {
             paramsString = this.initParams.get(0);
 
-            for(int i = 1; i < this.initParams.size(); i++){
+            for (int i = 1; i < this.initParams.size(); i++) {
                 paramsString += "," + initParams.get(i);
             }
         }

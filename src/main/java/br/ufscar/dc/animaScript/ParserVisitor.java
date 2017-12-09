@@ -139,7 +139,8 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         Action action = new Action(ctx.name.getText(), params);
 
-        local_variables = action.getParams();
+        local_variables = new ArrayList<String>();
+        local_variables.addAll(action.getParams());
 
         for (AnimaScriptParser.CommandContext cmd : ctx.command()) {
             action.addCommand((Command) visitCommand(cmd));
@@ -148,48 +149,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         local_variables = null;
 
         return action;
-    }
-
-    @Override
-    public Object visitExpr(AnimaScriptParser.ExprContext ctx) {
-        if (ctx.attr() != null) {
-
-            visitAttr(ctx.attr());
-
-//            List<String> idents = new ArrayList<String>();
-//
-//            for (Token ident : ctx.attr().idents) {
-//                idents.add(ident.getText());
-//            }
-//
-//            if(!local_variables.contains(idents.get(0))){
-//
-//                Element element_aux;
-//
-//                if (idents.get(0).equals("this")) {
-//                    if (cur_element == null) {
-//                        Main.out.printErro(ctx.start.getLine(), "'this' nao permitido neste escopo");
-//                        return ctx.getText();
-//                    }
-//
-//                    element_aux = cur_element;
-//
-//                } else {
-//                    if (animation.getInst_element().containsKey(idents.get(0))) {
-//                        element_aux = animation.getInst_element().get(idents.get(0));
-//                    } else {
-//                        Main.out.printErro(ctx.start.getLine(), idents.get(0) + " nao declarado");
-//                        return ctx.getText();
-//                    }
-//                }
-//
-//                if(!element_aux.verifyAttr(idents.subList(1, idents.size()))){
-//                    Main.out.printErro(ctx.start.getLine(), " expressao invalida ");
-//                }
-//            }
-        }
-
-        return super.visitExpr(ctx);
     }
 
     @Override
@@ -321,16 +280,32 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
     @Override
     public Object visitAction_call(AnimaScriptParser.Action_callContext ctx) {
         Command cmd = new Command();
-        ArrayList<String> params = new ArrayList<String>();
 
-        for (AnimaScriptParser.ExprContext expr : ctx.params) {
-            params.add(expr.getText());
+        if(ctx.start.getText().equals("start")){
+            ArrayList<String> params = new ArrayList<String>();
+
+            for (AnimaScriptParser.ExprContext expr : ctx.params) {
+                params.add(expr.getText());
+            }
+
+            List<String> idents = new ArrayList<String>();
+
+            for (Token token : ctx.attr().idents) {
+                idents.add(token.getText());
+            }
+
+            animation.getInst_element().get(idents.get(0)).verifyAction(idents.subList(1, idents.size()), params.size(), ctx.start.getLine());
+
+            //TODO: tratar o número de parametros
+
+            cmd.buildAction("start",
+                    ctx.attr().getText(), params);
+        } else {
+
+            cmd.buildAction("stop",
+                    ctx.attr().getText(), new ArrayList<String>());
         }
 
-        //TODO: tratar o número de parametros
-
-        cmd.buildAction(ctx.OP_ACTION().getText(),
-                ctx.attr().getText(), params);
 
         return cmd;
     }

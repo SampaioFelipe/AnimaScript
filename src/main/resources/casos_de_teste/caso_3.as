@@ -47,17 +47,14 @@ elements:
             this.y += b
         }
 
-        action deg_to_rad() {
-
-        }
-
         action rotaciona() {
             this.rotation += 0.05
+            k = 0
         }
 
         action escala() {
-            width += 6
-            height += 6
+            this.width += 6
+            this.height += 6
         }
     }
 
@@ -71,11 +68,18 @@ storyboard:
     start terra.rotaciona()
 [10s]:
     start terra1.rotaciona()
-    terra.lua.x = 10
+    terra.x = 10
     terra.y = 10
+    terra1.lua.x = 40
 
-[20s]:
+[10s]:
     start terra.escala()
 
+[12s]:
+    stop terra.escala
+
 [100f]:
-    start terra.translada(5,5)
+    start terra.translada(2,2)
+
+[150f]:
+    stop terra.translada

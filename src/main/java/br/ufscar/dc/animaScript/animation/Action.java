@@ -26,9 +26,11 @@ public class Action {
 
     public Action(String name, ArrayList<String> params){
         this.name = name;
+        this.params = new ArrayList<String>();
+
         this.setParams(params);
+
         this.commands = new ArrayList<Command>();
-        this.setParams(params);
     }
 
     public void addCommand(Command command) {
@@ -48,7 +50,7 @@ public class Action {
     }
 
     public void setParams(List<String> params){
-        this.params = params;
+        this.params.addAll(params);
     }
 
     public List<String> getParams() {

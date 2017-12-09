@@ -25,8 +25,6 @@ OP_ATTRIB2: '+=' | '-='| '*=';
 STRING : '"' ~('\n' | '\r' | '"')* '"';
 LOGIC_VAL : 'true' | 'false';
 
-OP_ACTION: 'start'|'stop';
-
 NUM_INT : DIGIT+;
 NUM_REAL : DIGIT+ '.' DIGIT+;
 
@@ -51,53 +49,51 @@ decl_global
 value
     : STRING | time | expr;
 
-num_value
-    : (expr | IDENT);
-
 time
     : NUM_INT 'f'
     | HOUR_FORMAT;
 
 expr
-    : (NUM_INT | NUM_REAL | attr) (OP_MATH expr)?
-    | ('(' expr')');
+    :(NUM_INT | NUM_REAL | attr) (OP_MATH expr)?
+    |('(' expr')');
 
 composition
-    : 'composition' ':' (attrs+=decl_attr_comp)+;
+    :'composition' ':' (attrs+=decl_attr_comp)+;
 
 decl_attr
-    : attr (OP_ATTRIB|OP_ATTRIB2) value;
+    :attr (OP_ATTRIB|OP_ATTRIB2) value;
 
 decl_attr_comp
-    : attr OP_ATTRIB value;
+    :attr OP_ATTRIB value;
 
-attr:
-    idents+=IDENT ('.' idents+=IDENT)*;
+attr
+    :idents+=IDENT ('.' idents+=IDENT)*;
 
-elements:
-    'elements' ':' (decls+=decl_element)+;
+elements
+    :'elements' ':' (decls+=decl_element)+;
 
-decl_element:
-    IDENT_DECL_ELEMENT '{' (decl_attr | decl_action | element_instance)* '}';
+decl_element
+    :IDENT_DECL_ELEMENT '{' (decl_attr | decl_action | element_instance)* '}';
 
-decl_action:
-    'action' name=IDENT '(' (params+=IDENT (',' params+=IDENT)*)? ')' '{' command* '}';
+decl_action
+    :'action' name=IDENT '(' (params+=IDENT (',' params+=IDENT)*)? ')' '{' command* '}';
 
-action_call:
-    OP_ACTION attr'(' (params+=expr (',' params+=expr)*)? ')';
+action_call
+    :'start' attr'(' (params+=expr (',' params+=expr)*)? ')'
+    |'stop' attr;
 
-element_instance:
-    IDENT_DECL_ELEMENT name=IDENT '('(params+=expr(',' params+=expr)*)?')';
+element_instance
+    :IDENT_DECL_ELEMENT name=IDENT '('(params+=expr(',' params+=expr)*)?')';
 
-scene:
-    'scene' ':' (element_instance)+;
+scene
+    :'scene' ':' (element_instance)+;
 
-storyboard:
-    'storyboard' ':' keyframe*;
+storyboard
+    :'storyboard' ':' keyframe*;
 
-keyframe:
-    '['time']' ':' cmds+=command+;
+keyframe
+    :'['time']' ':' cmds+=command+;
 
-command:
-    decl_attr
+command
+    : decl_attr
     | action_call;
