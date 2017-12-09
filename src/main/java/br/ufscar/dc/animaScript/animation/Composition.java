@@ -41,7 +41,6 @@ public class Composition {
         } else if (name.equals("fps")) {
             setFps(Integer.decode(attr.getValue()));
         } else if (name.equals("duration")) {
-            System.out.println("setando duração");
             setDuration(attr.getValue());
         } else if (name.equals("background")) {
             setBgcolor(attr.getValue());

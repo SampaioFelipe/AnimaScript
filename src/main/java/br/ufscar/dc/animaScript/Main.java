@@ -64,37 +64,18 @@ public class Main {
     }
 
     public static void printHelp() {
-        String texto = "Uso: java -jar anima [OPTIONS] fileA fileB\n" +
-                "Compila código em animaScript...\n" +
-                "Options:\n" +
-                "-v...  ";
+        String texto = "Compilador AnimaScript\nUso: java -jar anima src_file dest_folder\n";
 
-        System.out.println(texto);
+        System.err.println(texto);
     }
 
     public static boolean validateArgs(String[] args) {
-        if (args == null || args.length < 2) {
+        if (args == null || args.length != 2) {
             return false;
         }
 
-        String arg = args[0];
-        int i = 1;
-        while (arg.startsWith("-")) {
-            if (arg.equalsIgnoreCase("-v")) {
-
-            } else {
-                return false;
-            }
-
-            arg = args[i++];
-        }
-
-        if ((args.length != i + 1)) {
-            return false;
-        }
-
-        out.setInputName(args[i - 1]);
-        out.setOutputFolderName(args[i]);
+        out.setInputName(args[0]);
+        out.setOutputFolderName(args[1]);
 
         return true;
     }

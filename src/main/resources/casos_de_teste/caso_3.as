@@ -21,7 +21,7 @@ elements:
             this.x = a
             this.y = b
 
-#            k = 0
+            k = 0
 
             this.width = 7
             this.height = 7
@@ -43,8 +43,8 @@ elements:
         }
 
         action translada(a,b) { # Como colocar argumentos nos frames?
-            x += a
-            y += b
+            this.x += a
+            this.y += b
         }
 
         action deg_to_rad() {
@@ -52,7 +52,7 @@ elements:
         }
 
         action rotaciona() {
-            rotation += 0.05
+            this.rotation += 0.05
         }
 
         action escala() {
@@ -72,13 +72,10 @@ storyboard:
 [10s]:
     start terra1.rotaciona()
     terra.x = 10
-#    terra.a.y = 10
+    terra.a.y = 10
 
 [20s]:
     start terra.escala()
 
 [100f]:
     start terra.translada(5,5)
-
-
-#List<String> attrs = Arrays.asList(left.split("."));

@@ -62,10 +62,17 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitDecl_attr(AnimaScriptParser.Decl_attrContext ctx) {
-        String attr = ctx.attr().getText();
+        String attr = (String) visitAttr(ctx.attr());
         String value = (String) visitValue(ctx.value());
 
+        Attribute attribute = new Attribute(attr, value);
+
         return new Attribute(attr, value);
+    }
+
+    @Override
+    public Object visitAttr(AnimaScriptParser.AttrContext ctx) {
+        return ctx.getText();
     }
 
     @Override
@@ -169,9 +176,9 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
                 for(Command cmd : action.getCommands()){
                     String[] ident = cmd.getIdentifier().split("\\.");
                     if(ident[0].equals("this")){
-                        System.out.println(ident[1]);
                         element.getAttributes().remove(ident[1]);
-                        System.out.println(element.getAttributes());
+                    } else {
+                        cmd.setIdentifier("var " + cmd.getIdentifier());
                     }
                 }
             }
@@ -241,14 +248,15 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         if (ctx.decl_attr() != null) {
 
             Command cmd = new Command();
-
+            visitDecl_attr(ctx.decl_attr());
 
             if (ctx.decl_attr().OP_ATTRIB() != null) {
-                visitDecl_attr(ctx.decl_attr());
+
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),
                         ctx.decl_attr().OP_ATTRIB().getText(),
                         ctx.decl_attr().value().getText());
             } else {
+
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),
                         ctx.decl_attr().OP_ATTRIB2().getText(),
                         ctx.decl_attr().value().getText());

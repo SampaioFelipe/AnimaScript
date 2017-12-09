@@ -1,6 +1,7 @@
 package br.ufscar.dc.animaScript;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import br.ufscar.dc.animaScript.animation.Action;
@@ -20,8 +21,6 @@ public class CodeGenerator {
         this.animation = animation;
 
         this.codeBuffer = new StringBuffer();
-
-        System.out.println(animation);
 
         StringBuffer html = new StringBuffer();
 
@@ -186,9 +185,9 @@ public class CodeGenerator {
                         attributions += cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
                     } else {
                         codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", " +
-                                "func: function(){" + cmd.getIdentifier() +"("+inst.getKey());
+                                "func: function(){" + cmd.getIdentifier() + "(" + inst.getKey());
                         if (cmd.getNumberParams() > 0) {
-                            codeBuffer.append(","+cmd.decodeParams());
+                            codeBuffer.append("," + cmd.decodeParams());
                         }
                         codeBuffer.append(");}},");
                     }
@@ -231,13 +230,13 @@ public class CodeGenerator {
 
         codeBuffer.append(
                 "ctx.fillRect(0,0," + animation.getComposition().getWidth() + ", " + animation.getComposition().getHeight() + ");" +
-                "then = now - (delta % frame_duration);\n" +
-                "current_frame += 1;\n" +
-                "current_frame = current_frame % total_frame;\n" +
-                "}\n" +
-                "}" +
-                "}\n" +
-                "init();");
+                        "then = now - (delta % frame_duration);\n" +
+                        "current_frame += 1;\n" +
+                        "current_frame = current_frame % total_frame;\n" +
+                        "}\n" +
+                        "}" +
+                        "}\n" +
+                        "init();");
     }
 
     private void decodeElement(Element element) {
@@ -269,11 +268,12 @@ public class CodeGenerator {
         // Funcao init
         codeBuffer.append("init(" + element.decodeInitParams() + "){\n");
 
-        for(Map.Entry<String, Attribute> attr : element.getAttributes().entrySet()){
-            codeBuffer.append("this."+attr.getKey() + "=");
-            if(attr.getKey().equals("width")){
+        for (Map.Entry<String, Attribute> attr : element.getAttributes().entrySet()) {
+            codeBuffer.append("this." + attr.getKey() + "=");
+
+            if (attr.getKey().equals("width")) {
                 codeBuffer.append(image + ".naturalWidth;");
-            } else if(attr.getKey().equals("height")) {
+            } else if (attr.getKey().equals("height")) {
                 codeBuffer.append(image + ".naturalHeight;");
             } else {
                 codeBuffer.append(attr.getValue().getValue() + ";");
@@ -290,7 +290,10 @@ public class CodeGenerator {
         if (initAction != null) {
 
             for (Command command : initAction.getCommands()) {
-                decodeCommand(command,"");
+                if(command.getIdentifier().contains("this"))
+                    decodeCommand(command, "this");
+                else
+                    decodeCommand(command, "");
             }
         }
 
@@ -335,8 +338,23 @@ public class CodeGenerator {
 
         codeBuffer.append("){\n");
 
+        List<String> variables = new ArrayList<String>();
+
         for (Command cmd : action.getCommands()) {
-            decodeCommand(cmd, "obj");
+
+            if (cmd.getIdentifier().contains("this"))
+                decodeCommand(cmd, "obj");
+            else {
+                if (!variables.contains(cmd.getIdentifier())) {
+                    codeBuffer.append("var " + cmd.getIdentifier() + ";\n");
+                    codeBuffer.append(cmd.getIdentifier() + "=" + cmd.getValue() + ";\n");
+                    variables.add(cmd.getIdentifier());
+                } else {
+                    codeBuffer.append(cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n");
+
+                }
+
+            }
         }
 
         codeBuffer.append("}\n");
@@ -348,7 +366,7 @@ public class CodeGenerator {
             if (prefix.length() > 0)
                 prefix = prefix + ".";
 
-            codeBuffer.append(prefix + cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n");
+            codeBuffer.append(prefix + cmd.getIdentifier().replace("this.","") + cmd.getOp() + cmd.getValue() + ";\n");
         }
     }
 }
