@@ -12,7 +12,10 @@ public class Element {
     private String image_path;
     private HashMap<Integer, ArrayList<Command>> frames;
 
+    private ArrayList<String> decl_attributes;
+
     private HashMap<String, Attribute> attributes;
+
 
     private HashMap<String, Command> children;
 
@@ -42,15 +45,20 @@ public class Element {
         attributes.put("height", new Attribute("height", "0"));
         attributes.put("rotation", new Attribute("rotation", "0"));
 
+        decl_attributes = new ArrayList<String>();
+
+        decl_attributes.addAll(attributes.keySet());
+
         this.initParams = new ArrayList<String>();
     }
 
     public Element(Element old) {
         this.name = old.name;
 
-//        attributes = new HashMap<String, Attribute>();
         // Definição dos atributos padrões
         attributes = (HashMap<String, Attribute>) old.attributes.clone();
+        decl_attributes = old.decl_attributes;
+
         children = (HashMap<String, Command>) old.children.clone();
 
         actions = old.actions;
@@ -67,30 +75,24 @@ public class Element {
                 attribute.setValue(attr.getValue());
             } else {
                 this.attributes.put(attr.getName(), attr);
+                decl_attributes.add(attr.getName());
             }
         }
 
-        return true; // TODO: verificar casos em que isso dá errado
-    }
-
-    public boolean changeAttribute(String name, String value) {
-
-        if (this.attributes.containsKey(name)) {
-            Attribute attr = this.attributes.get(name);
-            attr.setValue(value);
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     public boolean verifyAttr(List<String> attrs){
+        if(attrs.size() == 0)
+            return false;
+
         String first = attrs.get(0);
-        if(attributes.containsKey(first)){
+
+        if(decl_attributes.contains(first)){
             return true;
         }
         else if(children.containsKey(first)){
-            return decl_elements.get(first).verifyAttr(attrs.subList(1, attrs.size()));
+            return decl_elements.get(children.get(first).getOp()).verifyAttr(attrs.subList(1, attrs.size()));
         }
 
         return false;
@@ -98,10 +100,6 @@ public class Element {
 
     public void setInitParams(List<String> params) {
         this.initParams = params;
-    }
-
-    public List<String> getInitParams() {
-        return initParams;
     }
 
     public String decodeInitParams(){

@@ -71,8 +71,8 @@ storyboard:
     start terra.rotaciona()
 [10s]:
     start terra1.rotaciona()
-    terra.x = 10
-    terra.a.y = 10
+    terra.lua.x = 10
+    terra.y = 10
 
 [20s]:
     start terra.escala()
