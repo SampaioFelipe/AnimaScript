@@ -1,9 +1,5 @@
 grammar AnimaScript;
 
-@header {
-
-}
-
 @members{
 static String grupo = "619523, 619744, 619930";
 }
