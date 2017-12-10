@@ -34,6 +34,7 @@ public class Composition {
     public boolean addAttribute(Attribute attr) {
         String name = attr.getName();
 
+        //verifica se o atributo adicionado é algum dos atributos padrões da composition
         if (name.equals("width")) {
             setWidth(Integer.decode(attr.getValue()));
         } else if (name.equals("height")) {

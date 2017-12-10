@@ -22,6 +22,8 @@ public class CodeGenerator {
 
         this.codeBuffer = new StringBuffer();
 
+
+        //Gera a parte HTML do código final
         StringBuffer html = new StringBuffer();
 
         html.append("<html>" +
