@@ -93,11 +93,13 @@ public class Element {
 
         String first = attrs.get(0);
 
+        //Verifica se o elemento tem o atributo que está sendo acessado
         if (decl_attributes.contains(first)) {
             if (attrs.size() > 1)
                 return false;
 
             return true;
+        //Verifica se os filhos do elemento tem o atributo que está sendo acessado
         } else if (children.containsKey(first)) {
             return decl_elements.get(children.get(first).getOp()).verifyAttr(attrs.subList(1, attrs.size()));
         }
@@ -113,6 +115,7 @@ public class Element {
 
         String first = attrs.get(0);
 
+        //Verifica se o elemento tem a action que está sendo acessada
         if (actions.containsKey(first)) {
             if (attrs.size() > 1) {
                 Main.out.printErro(linha, first + " nao possui actions");
@@ -125,6 +128,7 @@ public class Element {
             }
 
             return true;
+        //Verifica se os filhos do elemento tem a action que está sendo acessada
         } else if (children.containsKey(first)) {
             return decl_elements.get(children.get(first).getOp()).verifyAction(attrs.subList(1, attrs.size()), n_params, linha);
         }
