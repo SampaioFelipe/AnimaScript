@@ -98,9 +98,10 @@ public class Element {
             if (attrs.size() > 1)
                 return false;
             return true;
-        //Verifica se os filhos do elemento tem o atributo que está sendo acessado
+            //Verifica se os filhos do elemento tem o atributo que está sendo acessado
         } else if (children.containsKey(first)) {
-            return decl_elements.get(children.get(first).getOp()).verifyAttr(attrs.subList(1, attrs.size()));
+
+            return decl_elements.containsKey(first) && decl_elements.get(children.get(first).getOp()).verifyAttr(attrs.subList(1, attrs.size()));
         }
 
         return false;
@@ -127,7 +128,7 @@ public class Element {
             }
 
             return true;
-        //Verifica se os filhos do elemento tem a action que está sendo acessada
+            //Verifica se os filhos do elemento tem a action que está sendo acessada
         } else if (children.containsKey(first)) {
             return decl_elements.get(children.get(first).getOp()).verifyAction(attrs.subList(1, attrs.size()), n_params, linha);
         } else {

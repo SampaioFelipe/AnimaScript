@@ -56,15 +56,12 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitDecl_attr(AnimaScriptParser.Decl_attrContext ctx) {
-//        if (cur_element != null)
-//            declaring = true;
 
         String attr = (String) visitAttr(ctx.attr());
 
         if (!attr.contains("this"))
             local_variables.add(attr);
 
-//        declaring = false;
         String value = (String) visitValue(ctx.value());
 
         return new Attribute(attr, value);
@@ -139,9 +136,13 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         local_variables = new ArrayList<String>();
         local_variables.addAll(action.getParams());
 
+        declaring = true;
+
         for (AnimaScriptParser.CommandContext cmd : ctx.command()) {
             action.addCommand((Command) visitCommand(cmd));
         }
+
+        declaring = false;
 
         local_variables = null;
 
@@ -216,15 +217,24 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitElement_instance(AnimaScriptParser.Element_instanceContext ctx) {
-
-        ArrayList<String> params = new ArrayList<String>();
-
-        for (AnimaScriptParser.ExprContext expr : ctx.params) {
-            params.add(expr.getText());
-        }
-
         Command instance = new Command();
-        instance.buildAction(ctx.IDENT_DECL_ELEMENT().getText(), ctx.name.getText(), params);
+
+        if(!animation.getDecl_elements().containsKey(ctx.IDENT_DECL_ELEMENT().getText())){
+            Main.out.printErro(ctx.start.getLine(), "tipo '" + ctx.IDENT_DECL_ELEMENT().getText() + "' nao declarado");
+        } else {
+
+            ArrayList<String> params = new ArrayList<String>();
+
+            for (AnimaScriptParser.ExprContext expr : ctx.params) {
+                params.add(expr.getText());
+            }
+
+            if(animation.getDecl_elements().get(ctx.IDENT_DECL_ELEMENT().getText()).getNumberParamsConstructor() != params.size())
+                Main.out.printErro(ctx.start.getLine(), "numero de parametros incompativel com o tipo de elemento");
+            else {
+                instance.buildAction(ctx.IDENT_DECL_ELEMENT().getText(), ctx.name.getText(), params);
+            }
+        }
 
         return instance;
     }

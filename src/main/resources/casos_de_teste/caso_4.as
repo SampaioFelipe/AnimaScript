@@ -8,23 +8,20 @@ composition:
     width = 500
     height = 500
     fps = 25
-    duration = 1m15s # 10f
+    duration = 1m15s0f # 10f
     background = "#0ff"
 
 elements:
 
     Earth
     {
-        image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_earth.png"
+        image = "/src/main/resources/casos_de_teste/images/Canvas_earth.png"
 
         Moon lua(20,20)
 
         action init(a,b){
             this.x = a
             this.y = b
-
-#            width = 100
-#            height = 100
         }
 
         action translada(a,b) {
@@ -51,7 +48,7 @@ scene:
 storyboard:
 [0f]:
     start terra.rotaciona()
-[10s]:
+[10s0f]:
     start terra1.rotaciona()
     terra.x = 10
     terra.y = 10
