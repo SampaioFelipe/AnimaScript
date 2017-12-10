@@ -69,10 +69,13 @@ public class Element {
     }
 
     public boolean addAttribute(Attribute attr) {
+        //Verifica se o atributo que está sendo adicionado é uma imagem
         if (attr.getName().equals("image")) {
             setImage_path(attr.getValue());
         } else {
+            //Verifica se o atributo que está sendo adicionado
             if (this.attributes.containsKey(attr.getName())) {
+                //Atualiza o valor do atributo
                 Attribute attribute = this.attributes.get(attr.getName());
                 attribute.setValue(attr.getValue());
             } else {
@@ -172,6 +175,7 @@ public class Element {
         return false;
     }
 
+    //Relaciona determinado comando a um frame especifico
     public void addFrame(int frame, Command cmd) {
         if (this.frames.containsKey(frame)) {
             ArrayList<Command> cmds = this.frames.get(frame);

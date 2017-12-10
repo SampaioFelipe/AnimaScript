@@ -10,11 +10,9 @@ public class Animation {
 
     private Composition composition;
     private HashMap<String, Attribute> globals;
-
     private HashMap<String, Element> inst_element;
 
     public Animation() {
-
         this.globals = new HashMap<String, Attribute>();
         this.composition = new Composition();
 
@@ -47,14 +45,6 @@ public class Animation {
 
         state.append("\nStoryboard\n");
 
-//        for(Map.Entry<String, ArrayList<Command>> frame : this.frames.entrySet()) {
-//            state.append(frame.getKey() + ":\n");
-//
-//            for(Command command: frame.getValue()){
-//                state.append(command.toString() + "\n");
-//            }
-//        }
-
         return state.toString();
     }
 
@@ -70,7 +60,6 @@ public class Animation {
                 attribute.setValue(attr.getValue());
 
                 System.err.println("Redefinição de atributo global");
-                //TODO: relatar redefinição (warnings)
             }
         }
 
@@ -105,24 +94,14 @@ public class Animation {
         return false;
     }
 
+    //Adiciona os comandos ao frame especificado
     public boolean addFrame(String frame, ArrayList<Command> cmds, int line) {
         for (Command cmd : cmds) {
-            // TODO: tratar quando não acha o "."
             String[] identifiers = cmd.getIdentifier().split("\\.");
             if (this.inst_element.containsKey(identifiers[0])) {
                 Element obj = this.inst_element.get(identifiers[0]);
-//
-//                if((obj.getActions().containsKey(identifiers[1]) || obj.getAttributes().containsKey(identifiers[1]) || obj.getChildren().containsKey(identifiers[1]))
-//                        || (identifiers[1].equals("x") || identifiers[1].equals("y"))){
-//                    cmd.setIdentifier(identifiers[1]);
-//                } else {
-//                    Main.out.printErro(line, identifiers[1] + " não declarado");
-//                }
-
-                 // TODO: tratar aninhamento
                 obj.addFrame(Integer.decode(frame), cmd);
             } else {
-//                Main.out.printErro(line, identifiers[0] + " nao declarado");
                 return false;
             }
         }
@@ -137,6 +116,7 @@ public class Animation {
             return title.getValue();
         }
 
+        //Nome padrão da animação caso o usuário não defina
         return "AnimaScript Animation";
     }
 
@@ -169,6 +149,7 @@ public class Animation {
         return this.inst_element.get(name);
     }
 
+    //Converte um valor do formato horas:minutos:segundos para frames, de acordo com frames por segundo (fds)
     public int horas2frames(String horas, int linha) {
 
         int frames = 0;
@@ -180,7 +161,6 @@ public class Animation {
         String[] componentes = horas.split("h");
 
         if (componentes.length > 1) {
-            // TODO: definir limite de hora?
             valor = Integer.parseInt(componentes[0]);
             frames += fps * 360 * valor;
             horas = componentes[1];

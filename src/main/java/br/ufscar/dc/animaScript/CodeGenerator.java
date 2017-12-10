@@ -22,6 +22,8 @@ public class CodeGenerator {
 
         this.codeBuffer = new StringBuffer();
 
+
+        //Gera a parte HTML do código final
         StringBuffer html = new StringBuffer();
 
         html.append("<html>" +
@@ -244,7 +246,7 @@ public class CodeGenerator {
         String image = element.getName() + "_image";
 
         codeBuffer.append("var " + image + " = new Image();\n");
-        codeBuffer.append(image + ".src = " + element.getImage_path() + ";\n"); //TODO: devemos tratar a ordem
+        codeBuffer.append(image + ".src = " + element.getImage_path() + ";\n");
         codeBuffer.append(image + ".onload = function()\n" +
                 "{\n" +
                 "    init()\n" +
@@ -330,7 +332,7 @@ public class CodeGenerator {
 
     private void decodeDeclAction(Action action) {
 
-        codeBuffer.append(action.getName() + "(obj"); // TODO: tratar os parametros
+        codeBuffer.append(action.getName() + "(obj");
 
         if (action.getNumberParams() > 0) {
             codeBuffer.append("," + action.decodeParams());

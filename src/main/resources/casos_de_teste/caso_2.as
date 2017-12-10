@@ -17,7 +17,7 @@ elements:
     {
         image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_earth.png"
 
-#        Moon lua()
+        Moon lua()
         # Elementos também possuem ações, que podem alterar suas propriedades
 
         action init(a,b){
@@ -59,7 +59,7 @@ storyboard:
     start terra.rotaciona()
 [30m30s]:
     start terra2.translada()
-    start terra2.teste()
+    start terra2.lua.x = 4
     terra.x = 10
     terra.y = 10
 [100f]:

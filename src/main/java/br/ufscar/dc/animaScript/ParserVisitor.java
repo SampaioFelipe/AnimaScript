@@ -26,9 +26,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitDecl_global(AnimaScriptParser.Decl_globalContext ctx) {
-
         if (ctx.GLOBAL_ATTR() != null) {
-
             for (int i = 0; i < ctx.GLOBAL_ATTR().size(); i++) {
                 Attribute attr = new Attribute(ctx.GLOBAL_ATTR().get(i).getText(), ctx.value().get(i).getText());
                 animation.addGlobalAttr(attr);
@@ -96,6 +94,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
                 element_aux = cur_element;
             } else {
+                //Verifica se o elemento foi instanciado
                 if (animation.getInst_element().containsKey(idents.get(0))) {
                     element_aux = animation.getInst_element().get(idents.get(0));
                 } else {
@@ -133,6 +132,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         ArrayList<String> params = new ArrayList<String>();
 
+        //Pega os parametros daquela ação
         for (Token param : ctx.params) {
             params.add(param.getText());
         }
@@ -205,7 +205,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         for (AnimaScriptParser.Element_instanceContext instanceContext : ctx.element_instance()) {
             Command element = (Command) visitElement_instance(instanceContext);
             if (element != null) {
-
                 animation.addInstElement(element.getOp(),
                         element, instanceContext.start.getLine());
             }
@@ -243,10 +242,10 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         ArrayList<Command> cmds = new ArrayList<Command>();
 
         for (AnimaScriptParser.CommandContext cmdContext : ctx.cmds) {
-
             cmds.add((Command) visitCommand(cmdContext));
         }
 
+        //Adiciona os comandos ao frame especifico
         animation.addFrame((String) visitTime(ctx.time()), cmds, ctx.getStart().getLine());
 
         return null;
@@ -254,16 +253,19 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitCommand(AnimaScriptParser.CommandContext ctx) {
+        //Verifica se é uma atribuição ou uma chamada para um comando
         if (ctx.decl_attr() != null) {
 
             Command cmd = new Command();
             visitDecl_attr(ctx.decl_attr());
 
+            //Verifica se é apenas uma atribuição como ("=")
             if (ctx.decl_attr().OP_ATTRIB() != null) {
 
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),
                         ctx.decl_attr().OP_ATTRIB().getText(),
                         ctx.decl_attr().value().getText());
+            //Ou uma atribuição junto a uma atribuição junto de uma operação ("'+=' ou '-='ou '*=')
             } else {
 
                 cmd.buildAttribute(ctx.decl_attr().attr().getText(),
@@ -295,8 +297,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
             }
 
             animation.getInst_element().get(idents.get(0)).verifyAction(idents.subList(1, idents.size()), params.size(), ctx.start.getLine());
-
-            //TODO: tratar o número de parametros
 
             cmd.buildAction("start",
                     ctx.attr().getText(), params);
