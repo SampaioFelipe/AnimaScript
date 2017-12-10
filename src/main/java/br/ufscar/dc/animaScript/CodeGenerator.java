@@ -94,7 +94,6 @@ public class CodeGenerator {
                 "var total_frame = " + animation.getComposition().getTotalFrames() + ";\n" +
                 "var fps = " + animation.getComposition().getFPS() + ";\n" +
                 "var frame_duration = 1000/fps;\n" +
-                "var loop = false;\n" + // TODO: tratar escolha de loop
                 "var now;\n " +
                 "var then = Date.now();");
 
@@ -137,19 +136,20 @@ public class CodeGenerator {
                 "    this.rotation = 0;\n" +
                 "    this.frames = {};\n" +
                 "    this.last_frame = 0;\n" +
-                "    this.cur_actions = [];\n" +
+                "    this.cur_actions = [];" +
+                "    this.child = this;" +
                 "  }\n" +
-                "update(obj) {\n" +
-                "    var cur = obj.frames[current_frame];\n" +
+                "update() {\n" +
+                "    var cur = this.child.frames[current_frame];\n" +
                 "    if (typeof cur != 'undefined') {\n" +
-                "      for (var i = 0; i < cur.length; i++) {\n" +
+                "      for (let i = 0; i < cur.length; i++) {\n" +
                 "        if(cur[i].op == 0) {\n" +
-                "          obj.cur_actions.push(cur[i])\n" +
+                "          this.child.cur_actions.push(cur[i])\n" +
                 "        } else if(cur[i].op == 1) {\n" +
                 "          \n" +
-                "          for(var j = obj.cur_actions.length - 1; j >= 0 ; j--) {\n" +
-                "            if(obj.cur_actions[j].id == cur[i].id) {\n" +
-                "              obj.cur_actions.splice(j,1);\n" +
+                "          for(let j = this.child.cur_actions.length - 1; j >= 0 ; j--) {\n" +
+                "            if(this.child.cur_actions[j].id == cur[i].id) {\n" +
+                "              this.child.cur_actions.splice(j,1);\n" +
                 "              break;\n" +
                 "            }\n" +
                 "          }\n" +
@@ -158,8 +158,8 @@ public class CodeGenerator {
                 "        }\n" +
                 "      }\n" +
                 "    }\n" +
-                "    for (var i = 0; i < obj.cur_actions.length; i++) {\n" +
-                "      obj.cur_actions[i].func();\n" +
+                "    for (var i = 0; i < this.child.cur_actions.length; i++) {\n" +
+                "      this.child.cur_actions[i].func();\n" +
                 "    }\n" +
                 "  }" +
                 "}");
@@ -185,9 +185,9 @@ public class CodeGenerator {
                         attributions += cmd.getIdentifier() + cmd.getOp() + cmd.getValue() + ";\n";
                     } else {
                         codeBuffer.append("{id:\"" + cmd.getIdentifier() + "\", op:" + cmd.getOpId() + ", " +
-                                "func: function(){" + cmd.getIdentifier() + "(" + inst.getKey());
+                                "func: function(){" + cmd.getIdentifier() + "(");
                         if (cmd.getNumberParams() > 0) {
-                            codeBuffer.append("," + cmd.decodeParams());
+                            codeBuffer.append(cmd.decodeParams());
                         }
                         codeBuffer.append(");}},");
                     }
@@ -217,7 +217,7 @@ public class CodeGenerator {
 
         codeBuffer.append("function draw() {\n" +
                 "    requestAnimationFrame(draw);\n" +
-                "    if (loop || current_frame < total_frame) {\n" +
+                "    if (current_frame < total_frame) {\n" +
                 "      now = Date.now();\n" +
                 "      delta = now - then;\n" +
                 "      if((!paused && (delta > frame_duration)) || current_frame < 1) {" +
@@ -232,7 +232,6 @@ public class CodeGenerator {
                 "ctx.fillRect(0,0," + animation.getComposition().getWidth() + ", " + animation.getComposition().getHeight() + ");" +
                         "then = now - (delta % frame_duration);\n" +
                         "current_frame += 1;\n" +
-                        "current_frame = current_frame % total_frame;\n" +
                         "}\n" +
                         "}" +
                         "}\n" +
@@ -263,7 +262,7 @@ public class CodeGenerator {
             codeBuffer.append("this." + child.getIdentifier() + "= new " + child.getOp() + "();\n");
         }
 
-        codeBuffer.append("}\n");
+        codeBuffer.append("this.child = this;}\n");
 
         // Funcao init
         codeBuffer.append("init(" + element.decodeInitParams() + "){\n");
@@ -272,9 +271,16 @@ public class CodeGenerator {
             codeBuffer.append("this." + attr.getKey() + "=");
 
             if (attr.getKey().equals("width")) {
-                codeBuffer.append(image + ".naturalWidth;");
+                if(attr.getValue().getValue().equals("0"))
+                    codeBuffer.append(image + ".naturalWidth;");
+                else
+                    codeBuffer.append(attr.getValue().getValue()+ ";");
+
             } else if (attr.getKey().equals("height")) {
-                codeBuffer.append(image + ".naturalHeight;");
+                if(attr.getValue().getValue().equals("0"))
+                    codeBuffer.append(image + ".naturalHeight;");
+                else
+                    codeBuffer.append(attr.getValue().getValue()+ ";");
             } else {
                 codeBuffer.append(attr.getValue().getValue() + ";");
             }
@@ -304,7 +310,7 @@ public class CodeGenerator {
         // Definição da função de desenho
         codeBuffer.append("  draw(ctx) {\n" +
                 "    // atualiza estado\n" +
-                "    this.update(this);" +
+                "    this.update();" +
                 "    ctx.save();\n" +
                 "    ctx.translate(this.x, this.y);\n" +
                 "    ctx.rotate(this.rotation);\n");
@@ -330,10 +336,10 @@ public class CodeGenerator {
 
     private void decodeDeclAction(Action action) {
 
-        codeBuffer.append(action.getName() + "(obj"); // TODO: tratar os parametros
+        codeBuffer.append(action.getName() + "("); // TODO: tratar os parametros
 
         if (action.getNumberParams() > 0) {
-            codeBuffer.append("," + action.decodeParams());
+            codeBuffer.append(action.decodeParams());
         }
 
         codeBuffer.append("){\n");
@@ -342,8 +348,8 @@ public class CodeGenerator {
 
         for (Command cmd : action.getCommands()) {
 
-            if (cmd.getIdentifier().contains("this"))
-                decodeCommand(cmd, "obj");
+            if (cmd.getIdentifier().contains("this") || cmd.getIdentifier().contains("\\."))
+                decodeCommand(cmd, "this");
             else {
                 if (!variables.contains(cmd.getIdentifier())) {
                     codeBuffer.append("var " + cmd.getIdentifier() + ";\n");

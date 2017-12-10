@@ -1,74 +1,84 @@
 # Isso é um comentario
 
-@animation "Título da Animação"
-@authors "Nome dos autores"
-@description "Descrição da animação"
+@animation "Caso 2: Mario"
+@authors "Grupo Animascript"
+@description "Caso de teste para a disciplina de compiladores"
 
 composition:
-    width = 600
+    width = 900
     height = 600
-    fps = 25
-    duration = 1m15s # 10f
-    background = "#0ff"
+    fps = 30
+    duration = 12s0f # 10f
 
 elements:
-
-    Earth
+    Mario
     {
-        image = "/home/felipe/intelliJProjects/AnimaScript/AnimaScript/src/main/resources/casos_de_teste/images/Canvas_earth.png"
+        image = "../../src/main/resources/casos_de_teste/images/mario.png"
 
-#        Moon lua()
-        # Elementos também possuem ações, que podem alterar suas propriedades
+        width = 50
+        height = 52
 
-        action init(a,b){
-            x = a
-            y = b
+        action init(a, b) {
+            this.x = a
+            this.y = b
         }
 
-        action translada() {
-            x += 1
-            y += 1
+        action walk(x){
+            this.x += x
         }
 
-        action deg_to_rad() {
-
+        action jump_up(y){
+            this.y -= y
         }
 
-        action rotaciona() {
-            rotation += 0.05 #deg
+        action jump_down(y){
+            this.y += y
         }
+    }
 
-#        action escala() {
-#            scale = 0.5
-#        }
+    Background {
+        image = "../../src/main/resources/casos_de_teste/images/mario_bg.jpg"
+
+        x = 450
+        y = 250
     }
 
 scene:
-    Earth terra(20,20)
-#    terra.x = 300
-#    terra.y = 300
-
-    Earth terra2(100,100)
-#    terra2.x = 100
-#    terra2.y = 300
-
-#    Earth terra(100, 300)
+    Background bg()
+    Mario m1(0, 470)
 
 storyboard:
 [0f]:
-    start terra.rotaciona()
-[30m30s]:
-    start terra2.translada()
-    start terra2.teste()
-    terra.x = 10
-    terra.y = 10
-[100f]:
-    start terra.translada()
+    start m1.walk(3)
 
-[150f]:
-    start terra2.rotaciona()
-    stop terra.rotaciona()
+[4s0f]:
+    stop m1.walk
 
-[200f]:
-    stop terra.translada()
+[4s10f]:
+    start m1.jump_up(5)
+
+[4s20f]:
+    stop m1.jump_up
+    start m1.jump_down(5)
+
+[5s00f]:
+    stop m1.jump_down
+
+[5s10f]:
+    start m1.walk(3)
+
+[6s10f]:
+    start m1.jump_up(3)
+[7s10f]:
+    stop m1.jump_up
+    start m1.jump_down(3)
+
+[7s15f]:
+    stop m1.jump_down
+
+[9s15f]:
+    start m1.jump_down(3)
+
+[10s13f]:
+    stop m1.jump_down
 

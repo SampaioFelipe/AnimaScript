@@ -47,9 +47,8 @@ elements:
             this.y += b
         }
 
-        action rotaciona() {
-            this.rotation += 0.05
-            k = 0
+        action rotaciona(r) {
+            this.rotation += r
         }
 
         action escala() {

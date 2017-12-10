@@ -28,7 +28,7 @@ LOGIC_VAL : 'true' | 'false';
 NUM_INT : DIGIT+;
 NUM_REAL : DIGIT+ '.' DIGIT+;
 
-HOUR_FORMAT: ((DIGIT? DIGIT 'h')? DIGIT? DIGIT 'm')? DIGIT? DIGIT 's';
+HOUR_FORMAT: (((DIGIT? DIGIT 'h')? DIGIT? DIGIT 'm')? DIGIT? DIGIT 's')? DIGIT? DIGIT 'f';
 
 IDENT : (LOWER_CASE | '_') (LOWER_CASE | UPPER_CASE | DIGIT | '_')*;
 IDENT_DECL_ELEMENT : UPPER_CASE (LOWER_CASE | UPPER_CASE | DIGIT | '_')*;
@@ -50,11 +50,10 @@ value
     : STRING | time | expr;
 
 time
-    : NUM_INT 'f'
-    | HOUR_FORMAT;
+    : HOUR_FORMAT;
 
 expr
-    :(NUM_INT | NUM_REAL | attr) (OP_MATH expr)?
+    :'-'?(NUM_INT | NUM_REAL | attr) (OP_MATH expr)?
     |('(' expr')');
 
 composition

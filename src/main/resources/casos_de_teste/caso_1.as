@@ -1,58 +1,68 @@
 # Isso é um comentario
 
-@animation "Título da Animação"
-@authors "Nome dos autores"
-@description "Descrição da animação"
+@animation "Caso 1: Sistema Solar"
+@authors "Grupo Animascript"
+@description "Caso de teste para a disciplina de compiladores"
 
 composition:
-    width = 500
+    width = 900
     height = 500
     fps = 30
-    duration = 1h10m15s # 10f
+    duration = 1m15s0f # 10f
     background = "#00000"
 
 elements:
     Moon
     {
-        image = "https://mdn.mozillademos.org/files/1443/Canvas_moon.png"
-        width = 50 # ao configurar um dos atributos de tamanho, o outro mantém a
+        image = "../../src/main/resources/casos_de_teste/images/Canvas_moon.png"
+
+        action init(a, b) {
+            this.x = a
+            this.y = b
+        }
     }
 
     Earth
     {
-        image = "https://mdn.mozillademos.org/files/1429/Canvas_earth.png"
+        image = "../../src/main/resources/casos_de_teste/images/Canvas_earth.png"
+        x = 80
+        y = 80
 
-        Moon lua()
+        Moon lua(30,30)
 
-        # Elementos também possuem ações, que podem alterar suas propriedades
-        action rotate_lua() {
-            lua.rotation += 5
-        }
-
-        action self_rotation() {
-            rotation += 10
+        action rotaciona(r) {
+            this.rotation += r
         }
     }
 
     Sun {
-        image = "https://mdn.mozillademos.org/files/1456/Canvas_sun.png"
 
-        action init(a, b){
-            x = a
-            y = b
-        }
-        scale = 75
+        image = "../../src/main/resources/casos_de_teste/images/sol.png"
+        x = 450
+        y = 250
+        width = 100
+        height = 100
 
         Earth terra()
 
-        action rotate_terra() {
-            terra.rotation += 5
+        action rotaciona() {
+            this.rotation += 0.01
         }
     }
 
+    Background {
+        image = "../../src/main/resources/casos_de_teste/images/background.jpg"
+
+        x = 450
+        y = 250
+    }
+
 scene:
-    Sun sol(200,200)
+    Background bg()
+    Sun sol()
 
 storyboard:
-
+[0f]:
+    start sol.rotaciona()
+    start sol.terra.rotaciona(0.03)
 

@@ -40,11 +40,8 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitTime(AnimaScriptParser.TimeContext ctx) {
-        if (ctx.NUM_INT() != null) {
-            return ctx.NUM_INT().getText();
-        } else {
-            return String.valueOf(animation.horas2frames(ctx.HOUR_FORMAT().getText(), ctx.HOUR_FORMAT().getSymbol().getLine()));
-        }
+
+        return String.valueOf(animation.horas2frames(ctx.HOUR_FORMAT().getText(), ctx.HOUR_FORMAT().getSymbol().getLine()));
     }
 
     @Override
@@ -61,15 +58,15 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
     @Override
     public Object visitDecl_attr(AnimaScriptParser.Decl_attrContext ctx) {
-        if (cur_element != null)
-            declaring = true;
+//        if (cur_element != null)
+//            declaring = true;
 
         String attr = (String) visitAttr(ctx.attr());
 
         if (!attr.contains("this"))
             local_variables.add(attr);
 
-        declaring = false;
+//        declaring = false;
         String value = (String) visitValue(ctx.value());
 
         return new Attribute(attr, value);
@@ -159,10 +156,14 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
 
         local_variables = new ArrayList<String>();
 
+        declaring = true;
+
         for (AnimaScriptParser.Decl_attrContext decl_attr : ctx.decl_attr()) {
             Attribute attribute = (Attribute) visitDecl_attr(decl_attr);
             element.addAttribute(attribute);
         }
+
+        declaring = false;
 
         if (element.getImage_path() == null) {
             Main.out.printErro(ctx.IDENT_DECL_ELEMENT().getSymbol().getLine(),
@@ -257,6 +258,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
         if (ctx.decl_attr() != null) {
 
             Command cmd = new Command();
+
             visitDecl_attr(ctx.decl_attr());
 
             if (ctx.decl_attr().OP_ATTRIB() != null) {
@@ -281,7 +283,7 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
     public Object visitAction_call(AnimaScriptParser.Action_callContext ctx) {
         Command cmd = new Command();
 
-        if(ctx.start.getText().equals("start")){
+        if (ctx.start.getText().equals("start")) {
             ArrayList<String> params = new ArrayList<String>();
 
             for (AnimaScriptParser.ExprContext expr : ctx.params) {
@@ -295,8 +297,6 @@ public class ParserVisitor extends AnimaScriptBaseVisitor<Object> {
             }
 
             animation.getInst_element().get(idents.get(0)).verifyAction(idents.subList(1, idents.size()), params.size(), ctx.start.getLine());
-
-            //TODO: tratar o número de parametros
 
             cmd.buildAction("start",
                     ctx.attr().getText(), params);

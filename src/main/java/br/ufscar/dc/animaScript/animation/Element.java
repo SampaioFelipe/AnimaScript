@@ -93,7 +93,6 @@ public class Element {
         if (decl_attributes.contains(first)) {
             if (attrs.size() > 1)
                 return false;
-
             return true;
         } else if (children.containsKey(first)) {
             return decl_elements.get(children.get(first).getOp()).verifyAttr(attrs.subList(1, attrs.size()));
@@ -124,6 +123,8 @@ public class Element {
             return true;
         } else if (children.containsKey(first)) {
             return decl_elements.get(children.get(first).getOp()).verifyAction(attrs.subList(1, attrs.size()), n_params, linha);
+        } else {
+            Main.out.printErro(linha, "action '" + first + "' nao implementada");
         }
 
         return false;

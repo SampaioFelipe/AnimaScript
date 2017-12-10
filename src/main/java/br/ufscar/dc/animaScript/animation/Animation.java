@@ -180,7 +180,6 @@ public class Animation {
         String[] componentes = horas.split("h");
 
         if (componentes.length > 1) {
-            // TODO: definir limite de hora?
             valor = Integer.parseInt(componentes[0]);
             frames += fps * 360 * valor;
             horas = componentes[1];
@@ -202,7 +201,7 @@ public class Animation {
 
         componentes = horas.split("s");
 
-        if (componentes.length > 0) {
+        if (componentes.length > 1) {
             valor = Integer.parseInt(componentes[0]);
 
             if (valor > 59) {
@@ -211,6 +210,21 @@ public class Animation {
             }
 
             frames += fps * valor;
+
+            horas = componentes[1];
+        }
+
+        componentes = horas.split("f");
+
+        if (componentes.length > 0) {
+            valor = Integer.parseInt(componentes[0]);
+
+            if (valor > fps - 1) {
+                Main.out.printErro(linha, msg_erro);
+                return 0;
+            }
+
+            frames += valor;
         }
 
         return frames;
