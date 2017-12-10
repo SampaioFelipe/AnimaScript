@@ -15,7 +15,6 @@ fragment LOWER_CASE: ('a'..'z');
 
 fragment UPPER_CASE: ('A'..'Z');
 
-//UNIT: '%' | 'deg' | 'rad';
 
 OP_MATH: ('+'|'-'|'*'|'/');
 
